@@ -52,32 +52,17 @@ val restrictedList = listOf(
     R.drawable.glock18
 )
 val classifiedList = listOf(
-    R.drawable.sawedoff,
-    R.drawable.mp7,
-    R.drawable.fiveseven,
-    R.drawable.m4a4,
-    R.drawable.glock18
-)
-val covertList = listOf(
     R.drawable.zeusx27,
     R.drawable.usps,
     R.drawable.m4a4s,
 )
-val exceedingly_rareList = listOf(
+val covertList = listOf(
     R.drawable.awp,
     R.drawable.ak47
 )
-val contrabandList = listOf(
+val exceedingly_rareList = listOf(
     R.drawable.ssg
 )
-//////////////////////////////////
-
-///////Заготовки для алгоритма рандома///////
-val probabilities = intArrayOf(26,64,320,1598,7992)
-var typeOfWeapon: weaponTypes = TODO()
-enum class weaponTypes {
-    milspec, restricted, classified, covert, exceedingly_rare, contraband
-}
 
 ////////Сам алгоритм рандома////////////////////
 fun randomWeapon(): Int {
@@ -85,28 +70,19 @@ fun randomWeapon(): Int {
     val choise = (0..9999).random()
     when (choise) {
         in 0..25 -> {
-            typeOfWeapon = weaponTypes.milspec
-            weaponImageName = milspecList.random()
-        }
-        in 26..63 -> {
-            typeOfWeapon = weaponTypes.restricted
-            weaponImageName = restrictedList.random()
-        }
-        in 64..319 -> {
-            typeOfWeapon = weaponTypes.classified
-            weaponImageName = classifiedList.random()
-        }
-        in 320..1597 -> {
-            typeOfWeapon = weaponTypes.covert
-            weaponImageName = covertList.random()
-        }
-        in 1598..7991 -> {
-            typeOfWeapon = weaponTypes.exceedingly_rare
             weaponImageName = exceedingly_rareList.random()
         }
-        in 7992..9999 -> {
-            typeOfWeapon = weaponTypes.contraband
-            weaponImageName = contrabandList.random()
+        in 26..89 -> {
+            weaponImageName = covertList.random()
+        }
+        in 90..409 -> {
+            weaponImageName = classifiedList.random()
+        }
+        in 320..2007 -> {
+            weaponImageName = restrictedList.random()
+        }
+        in 1598..9999 -> {
+            weaponImageName = milspecList.random()
         }
     }
     return weaponImageName
@@ -174,7 +150,6 @@ fun Case1(onClick: (Any?) -> Unit) {
     var lastIndex by remember { mutableStateOf(-1) }
 
 
-    val index = (0..40).random()
     LaunchedEffect(Unit) {
         val itemSize = 50.dp
 
@@ -229,7 +204,7 @@ fun Case1(onClick: (Any?) -> Unit) {
         ) {
             items(images.size) { index ->
                 Image(
-                    painter = painterResource(id = images[index]),
+                    painter = painterResource(id = randomWeapon()),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
