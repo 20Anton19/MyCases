@@ -25,6 +25,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.ui.input.pointer.pointerInput
@@ -33,91 +34,138 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 
-/*
-@Composable
-fun Case1(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(color = Color.Green)
-            .fillMaxSize()
-    ) {
+///////Списки картинок оружия по цветам///////
+val milspecList = listOf(
+    R.drawable.ssg,
+    R.drawable.nova,
+    R.drawable.ump45,
+    R.drawable.xm1014,
+    R.drawable.tec9,
+    R.drawable.ssg,
+    R.drawable.mac10
+)
+val restrictedList = listOf(
+    R.drawable.sawedoff,
+    R.drawable.mp7,
+    R.drawable.fiveseven,
+    R.drawable.m4a4,
+    R.drawable.glock18
+)
+val classifiedList = listOf(
+    R.drawable.sawedoff,
+    R.drawable.mp7,
+    R.drawable.fiveseven,
+    R.drawable.m4a4,
+    R.drawable.glock18
+)
+val covertList = listOf(
+    R.drawable.zeusx27,
+    R.drawable.usps,
+    R.drawable.m4a4s,
+)
+val exceedingly_rareList = listOf(
+    R.drawable.awp,
+    R.drawable.ak47
+)
+val contrabandList = listOf(
+    R.drawable.ssg
+)
+//////////////////////////////////
 
-        Button(
-            modifier = Modifier
-                .fillMaxSize(),
-            onClick = {
-                onClick()
-            }
-        ) {
-
-        }
-        Image(
-            painter = painterResource(id = R.drawable.background1),
-            contentDescription = "mainbg",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-    }
+///////Заготовки для алгоритма рандома///////
+val probabilities = intArrayOf(26,64,320,1598,7992)
+var typeOfWeapon: weaponTypes = TODO()
+enum class weaponTypes {
+    milspec, restricted, classified, covert, exceedingly_rare, contraband
 }
-*/
+
+////////Сам алгоритм рандома////////////////////
+fun randomWeapon(): Int {
+    var weaponImageName: Int = 0
+    val choise = (0..9999).random()
+    when (choise) {
+        in 0..25 -> {
+            typeOfWeapon = weaponTypes.milspec
+            weaponImageName = milspecList.random()
+        }
+        in 26..63 -> {
+            typeOfWeapon = weaponTypes.restricted
+            weaponImageName = restrictedList.random()
+        }
+        in 64..319 -> {
+            typeOfWeapon = weaponTypes.classified
+            weaponImageName = classifiedList.random()
+        }
+        in 320..1597 -> {
+            typeOfWeapon = weaponTypes.covert
+            weaponImageName = covertList.random()
+        }
+        in 1598..7991 -> {
+            typeOfWeapon = weaponTypes.exceedingly_rare
+            weaponImageName = exceedingly_rareList.random()
+        }
+        in 7992..9999 -> {
+            typeOfWeapon = weaponTypes.contraband
+            weaponImageName = contrabandList.random()
+        }
+    }
+    return weaponImageName
+}
+////////////////////////////////////////////////
 
 val images = listOf(
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
+    R.drawable.ak47,
     R.drawable.awp,
-    R.drawable.kalash,
+    R.drawable.fiveseven,
+    R.drawable.glock18,
+    R.drawable.m4a4,
+    R.drawable.m4a4s,
+    R.drawable.mac10,
+    R.drawable.mp7,
+    R.drawable.nova,
+    R.drawable.sawedoff,
+    R.drawable.ssg,
+    R.drawable.tec9,
+    R.drawable.ump45,
+    R.drawable.usps,
+    R.drawable.xm1014,
+    R.drawable.zeusx27,
+    R.drawable.ak47,
     R.drawable.awp,
+    R.drawable.fiveseven,
+    R.drawable.glock18,
+    R.drawable.m4a4,
+    R.drawable.m4a4s,
+    R.drawable.mac10,
+    R.drawable.mp7,
+    R.drawable.nova,
+    R.drawable.sawedoff,
+    R.drawable.ssg,
+    R.drawable.tec9,
+    R.drawable.ump45,
+    R.drawable.usps,
+    R.drawable.xm1014,
+    R.drawable.zeusx27,
+    R.drawable.ak47,
     R.drawable.awp,
-    R.drawable.awp,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.awp,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.awp,
-    R.drawable.kalash,
-    R.drawable.awp,
-    R.drawable.awp,
-    R.drawable.awp,
-    R.drawable.awp,
-    R.drawable.awp,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash,
-    R.drawable.kalash
+    R.drawable.fiveseven,
+    R.drawable.glock18,
+    R.drawable.m4a4,
+    R.drawable.m4a4s,
+    R.drawable.mac10,
+    R.drawable.mp7,
+    R.drawable.nova,
+    R.drawable.sawedoff,
+    R.drawable.ssg,
+    R.drawable.tec9,
+    R.drawable.ump45,
+    R.drawable.usps,
+    R.drawable.xm1014,
+    R.drawable.zeusx27
 )
 
 @Composable
 fun Case1(onClick: (Any?) -> Unit) {
-    // Sample list of images
-
-
-
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -126,6 +174,7 @@ fun Case1(onClick: (Any?) -> Unit) {
     var lastIndex by remember { mutableStateOf(-1) }
 
 
+    val index = (0..40).random()
     LaunchedEffect(Unit) {
         val itemSize = 50.dp
 
@@ -136,9 +185,6 @@ fun Case1(onClick: (Any?) -> Unit) {
                 value = itemSizePx * itemsScrollCount,
                 animationSpec = tween(durationMillis = 12000, easing = LinearOutSlowInEasing)
             )
-            // After the animation ends, calculate the centered item
-            val firstVisibleItem = listState.firstVisibleItemIndex
-            val firstVisibleItemOffset = listState.firstVisibleItemScrollOffset
 
             // Calculate the center position
             val center = listState.layoutInfo.viewportEndOffset / 2
@@ -199,6 +245,7 @@ fun Case1(onClick: (Any?) -> Unit) {
         )
     }
 }
+
 
 @Composable
 fun CaseResult(centerItemIndex: Int?, onClick: () -> Unit) {

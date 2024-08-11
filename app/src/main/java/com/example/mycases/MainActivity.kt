@@ -45,9 +45,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -142,7 +145,7 @@ private fun MyApp(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(30.dp, 65.dp, 30.dp, 30.dp),
+                        .padding(30.dp, 65.dp, 30.dp, 65.dp),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Column(
@@ -168,16 +171,19 @@ private fun MyApp(navController: NavController) {
                         }
                         Card(
                             modifier = Modifier
-                                .background(color = Color.Red)
-                                .width(100.dp)
+                                .width(150.dp)
                                 .height(100.dp)
-                                .padding(10.dp)
                                 .clickable {
                                     navController.navigate("screen_4")
                                 }
+                                .graphicsLayer(rotationZ = angle)
                         ) {
-                            Text(
-                                text = "Газ"
+                            Image(
+                                painter = painterResource(id = R.drawable.kalash),
+                                contentDescription = "case1",
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop
                             )
                         }
 
@@ -188,27 +194,60 @@ private fun MyApp(navController: NavController) {
                     ){
                         Card(
                             modifier = Modifier
-                                .background(color = Color.Blue)
-                                .width(100.dp)
+                                .width(150.dp)
                                 .height(100.dp)
+                                .clickable {
+                                    navController.navigate("screen_2")
+                                }
+                                .graphicsLayer(rotationZ = angle)
                         ) {
-                            Text(
-                                text = "Газище"
+                            Image(
+                                painter = painterResource(id = R.drawable.kalash),
+                                contentDescription = "case1",
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop
                             )
                         }
                         Card(
                             modifier = Modifier
-                                .background(color = Color.Red)
-                                .width(100.dp)
+                                .width(150.dp)
                                 .height(100.dp)
-                                .padding(10.dp)
+                                .clickable {
+                                    navController.navigate("screen_2")
+                                }
+                                .graphicsLayer(rotationZ = angle)
                         ) {
-                            Text(
-                                text = "Газ"
+                            Image(
+                                painter = painterResource(id = R.drawable.kalash),
+                                contentDescription = "case1",
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop
                             )
                         }
 
                     }
+                }
+            },
+            bottomBar = {
+                BottomAppBar (
+                    modifier = Modifier
+                        .height(35.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        text = "Bottom app bar",
+                    )
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {  }) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
                 }
             }
         )
