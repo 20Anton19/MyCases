@@ -1,5 +1,6 @@
 package com.example.mycases
 
+import android.graphics.fonts.FontFamily
 import android.media.MediaPlayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -27,11 +28,16 @@ import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 ///////Списки картинок оружия по цветам///////
@@ -139,7 +145,7 @@ val images = listOf(
     R.drawable.xm1014,
     R.drawable.zeusx27
 )
-
+val weaponList = mutableStateListOf<Int>()
 @Composable
 fun Case1(onClick: (Any?) -> Unit) {
     val listState = rememberLazyListState()
@@ -149,15 +155,12 @@ fun Case1(onClick: (Any?) -> Unit) {
     val context = LocalContext.current
     var lastIndex by remember { mutableStateOf(-1) }
 
-    // Список для хранения значений, которые выпадают в randomWeapon()
-    val weaponList = remember { mutableStateListOf<Int>() }
-
 
     LaunchedEffect(Unit) {
-        val itemSize = 50.dp
+        val itemSize = 25.dp
 
         val itemSizePx = with(density) { itemSize.toPx() }
-        val itemsScrollCount = 150
+        val itemsScrollCount = (297..303).random()
         coroutineScope.launch {
             listState.animateScrollBy(
                 value = itemSizePx * itemsScrollCount,
@@ -204,10 +207,15 @@ fun Case1(onClick: (Any?) -> Unit) {
                 .fillMaxWidth()
                 .height(200.dp)
         ) {
-            repeat(46) {
+            repeat(47) {
                 weaponList.add(randomWeapon())
             }
-            items(46) { index ->
+            items(47) { index ->
+                // запасной вариант, но вроде как более лагучий
+                //if (index >= weaponList.size) {
+                    // Добавляем новый элемент в список, если его еще нет
+                    //weaponList.add(randomWeapon())
+                //}
                 Image(
                     painter = painterResource(id = weaponList[index]),
                     contentDescription = null,
@@ -218,11 +226,19 @@ fun Case1(onClick: (Any?) -> Unit) {
                 )
             }
         }
-        Box( //пустой контейнер - витрина, чтобы не давать трогать lazyrow
+        Row( //пустой контейнер - витрина, чтобы не давать трогать lazyrow
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {}
-        )
+                .pointerInput(Unit) {},
+            horizontalArrangement = Arrangement.SpaceAround
+
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.rectangle),
+                contentDescription = "mainbg",
+                contentScale = ContentScale.Crop
+            )
+        }
     }
 }
 
@@ -262,5 +278,30 @@ fun CaseResult(centerItemIndex: Int?, onClick: () -> Unit) {
                 .size((100 * animatedScale).dp), // Применяем масштаб к размеру изображения
             contentScale = ContentScale.Fit
         )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp, 65.dp, 30.dp, 65.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Card(
+                modifier = Modifier
+                    .width(320.dp)
+                    .height(80.dp)
+            ) {
+                Text(
+                    text = "CONGRATS!!!",
+                    fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
+                    fontSize = 50.sp,               // Используйте нужный размер шрифта
+                    color = Color.White
+                )
+            }
+
+        }
     }
 }
