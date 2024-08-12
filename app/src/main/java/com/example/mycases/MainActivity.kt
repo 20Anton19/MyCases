@@ -69,16 +69,16 @@ class MainActivity : ComponentActivity() {
                     MyApp(navController)
                 }
                 composable("screen_2"){
-                    Case1 { centerItemIndex ->
-                        navController.navigate("screen_3/$centerItemIndex")
+                    Case1 { resultWeapon ->
+                        navController.navigate("screen_3/$resultWeapon")
                     }
                 }
                 composable(
-                    route = "screen_3/{centerItemIndex}",
-                    arguments = listOf(navArgument("centerItemIndex") { type = NavType.IntType })
+                    route = "screen_3/{resultWeapon}",
+                    arguments = listOf(navArgument("resultWeapon") { type = NavType.IntType })
                 ) { backStackEntry ->
-                    val centerItemIndex = backStackEntry.arguments?.getInt("centerItemIndex")
-                    CaseResult(centerItemIndex) {
+                    val resultWeapon = backStackEntry.arguments?.getInt("resultWeapon")
+                    CaseResult(resultWeapon) {
                         navController.navigate("screen_1")
                     }
                 }
