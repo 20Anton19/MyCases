@@ -26,7 +26,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.ui.input.pointer.pointerInput
@@ -150,9 +149,9 @@ fun Case1(onClick: (Any?) -> Unit) {
     val context = LocalContext.current
     var lastIndex by remember { mutableStateOf(-1) }
 
-
     // Список для хранения значений, которые выпадают в randomWeapon()
     val weaponList = remember { mutableStateListOf<Int>() }
+
 
     LaunchedEffect(Unit) {
         val itemSize = 50.dp
@@ -160,9 +159,6 @@ fun Case1(onClick: (Any?) -> Unit) {
         val itemSizePx = with(density) { itemSize.toPx() }
         val itemsScrollCount = 150
         coroutineScope.launch {
-            repeat(60) {
-                weaponList.add(randomWeapon())
-            }
             listState.animateScrollBy(
                 value = itemSizePx * itemsScrollCount,
                 animationSpec = tween(durationMillis = 12000, easing = LinearOutSlowInEasing)
@@ -172,13 +168,12 @@ fun Case1(onClick: (Any?) -> Unit) {
             val center = listState.layoutInfo.viewportEndOffset / 2
 
             // Find the item closest to the center
-            val centerItemIndex = listState.layoutInfo.visibleItemsInfo.minByOrNull {
+            var centerItemIndex = listState.layoutInfo.visibleItemsInfo.minByOrNull {
                 Math.abs(it.offset + it.size / 2 - center)
             }?.index
 
-            val resultWeapon = weaponList[centerItemIndex!!]
             delay(300) // задержка
-            onClick(resultWeapon)
+            onClick(weaponList[43])
         }
 
     }
@@ -191,7 +186,6 @@ fun Case1(onClick: (Any?) -> Unit) {
             mediaPlayer.setOnCompletionListener { it.release() }
         }
     }
-
 
     // LazyRow with animated offset
     Box(
@@ -210,7 +204,10 @@ fun Case1(onClick: (Any?) -> Unit) {
                 .fillMaxWidth()
                 .height(200.dp)
         ) {
-            items(60) { index ->
+            repeat(46) {
+                weaponList.add(randomWeapon())
+            }
+            items(46) { index ->
                 Image(
                     painter = painterResource(id = weaponList[index]),
                     contentDescription = null,
@@ -231,7 +228,7 @@ fun Case1(onClick: (Any?) -> Unit) {
 
 
 @Composable
-fun CaseResult(resultWeapon: Int?, onClick: () -> Unit) {
+fun CaseResult(centerItemIndex: Int?, onClick: () -> Unit) {
     // Переменная состояния для масштаба изображения
     var scale by remember { mutableStateOf(1f) }
 
@@ -259,7 +256,7 @@ fun CaseResult(resultWeapon: Int?, onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = resultWeapon!!),
+            painter = painterResource(id = centerItemIndex!!),
             contentDescription = null,
             modifier = Modifier
                 .size((100 * animatedScale).dp), // Применяем масштаб к размеру изображения
