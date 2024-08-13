@@ -146,6 +146,7 @@ val images = listOf(
     R.drawable.zeusx27
 )
 val weaponList = mutableStateListOf<Int>()
+
 @Composable
 fun Case1(onClick: (Any?) -> Unit) {
     val listState = rememberLazyListState()
