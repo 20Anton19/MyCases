@@ -2,6 +2,7 @@ package com.example.mycases
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -55,6 +56,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.mycases.ui.theme.Roulette
+import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,16 +70,21 @@ class MainActivity : ComponentActivity() {
                 composable("screen_1"){
                     MyApp(navController)
                 }
-                composable("screen_2"){
+                // Экран 2: Передача объекта WeaponData
+                composable("screen_2") {
                     Case1 { resultWeapon ->
-                        navController.navigate("screen_3/$resultWeapon")
+                        val weaponJson = Uri.encode(Gson().toJson(resultWeapon))
+                        navController.navigate("screen_3/$weaponJson")
                     }
                 }
+
+                // Экран 3: Получение объекта WeaponData
                 composable(
                     route = "screen_3/{resultWeapon}",
-                    arguments = listOf(navArgument("resultWeapon") { type = NavType.IntType })
+                    arguments = listOf(navArgument("resultWeapon") { type = NavType.StringType })
                 ) { backStackEntry ->
-                    val resultWeapon = backStackEntry.arguments?.getInt("resultWeapon")
+                    val weaponJson = backStackEntry.arguments?.getString("resultWeapon")
+                    val resultWeapon = Gson().fromJson(weaponJson, WeaponData::class.java)
                     CaseResult(resultWeapon) {
                         navController.navigate("screen_1")
                     }

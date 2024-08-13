@@ -40,58 +40,59 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-///////Списки картинок оружия по цветам///////
+///////Списки картинок оружия по цветам(редкости)///////
 val milspecList = listOf(
-    R.drawable.ssg,
-    R.drawable.nova,
-    R.drawable.ump45,
-    R.drawable.xm1014,
-    R.drawable.tec9,
-    R.drawable.ssg,
-    R.drawable.mac10
+    WeaponData(R.drawable.ssg, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.nova, 3600, "Nova", "mil-spec"),
+    WeaponData(R.drawable.ump45, 3600, "Ump-45", "mil-spec"),
+    WeaponData(R.drawable.xm1014, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.tec9, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.ssg, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.mac10, 3600, "SSG", "mil-spec")
 )
 val restrictedList = listOf(
-    R.drawable.sawedoff,
-    R.drawable.mp7,
-    R.drawable.fiveseven,
-    R.drawable.m4a4,
-    R.drawable.glock18
+    WeaponData(R.drawable.sawedoff, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.mp7, 3600, "Nova", "mil-spec"),
+    WeaponData(R.drawable.fiveseven, 3600, "Ump-45", "mil-spec"),
+    WeaponData(R.drawable.m4a4, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.glock18, 3600, "SSG", "mil-spec")
 )
 val classifiedList = listOf(
-    R.drawable.zeusx27,
-    R.drawable.usps,
-    R.drawable.m4a4s,
+    WeaponData(R.drawable.zeusx27, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.usps, 3600, "Nova", "mil-spec"),
+    WeaponData(R.drawable.m4a4s, 3600, "Ump-45", "mil-spec")
 )
 val covertList = listOf(
-    R.drawable.awp,
-    R.drawable.ak47
+    WeaponData(R.drawable.awp, 3600, "SSG", "mil-spec"),
+    WeaponData(R.drawable.ak47, 3600, "Nova", "mil-spec")
 )
 val exceedingly_rareList = listOf(
-    R.drawable.ssg
+    WeaponData(R.drawable.ssg, 3600, "SSG", "mil-spec")
 )
 
+
 ////////Сам алгоритм рандома////////////////////
-fun randomWeapon(): Int {
-    var weaponImageName: Int = 0
+fun randomWeapon(): WeaponData {
+    var weapon = WeaponData(R.drawable.ssg, 0, "Шаблон", "Шаблон")
     val choise = (0..9999).random()
     when (choise) {
         in 0..25 -> {
-            weaponImageName = exceedingly_rareList.random()
+            weapon = exceedingly_rareList.random()
         }
         in 26..89 -> {
-            weaponImageName = covertList.random()
+            weapon = covertList.random()
         }
         in 90..409 -> {
-            weaponImageName = classifiedList.random()
+            weapon = classifiedList.random()
         }
         in 320..2007 -> {
-            weaponImageName = restrictedList.random()
+            weapon = restrictedList.random()
         }
         in 1598..9999 -> {
-            weaponImageName = milspecList.random()
+            weapon = milspecList.random()
         }
     }
-    return weaponImageName
+    return weapon
 }
 ////////////////////////////////////////////////
 
@@ -145,7 +146,7 @@ val images = listOf(
     R.drawable.xm1014,
     R.drawable.zeusx27
 )
-val weaponList = mutableStateListOf<Int>()
+val weaponList = mutableStateListOf<WeaponData>()
 
 @Composable
 fun Case1(onClick: (Any?) -> Unit) {
@@ -218,7 +219,7 @@ fun Case1(onClick: (Any?) -> Unit) {
                     //weaponList.add(randomWeapon())
                 //}
                 Image(
-                    painter = painterResource(id = weaponList[index]),
+                    painter = painterResource(id = weaponList[index].image),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -245,9 +246,10 @@ fun Case1(onClick: (Any?) -> Unit) {
 
 
 @Composable
-fun CaseResult(centerItemIndex: Int?, onClick: () -> Unit) {
+fun CaseResult(centerItemIndex: WeaponData?, onClick: () -> Unit) {
     // Переменная состояния для масштаба изображения
     var scale by remember { mutableStateOf(1f) }
+
 
     // Анимируемый масштаб изображения
     val animatedScale by animateFloatAsState(
@@ -273,7 +275,7 @@ fun CaseResult(centerItemIndex: Int?, onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = centerItemIndex!!),
+            painter = painterResource(id = centerItemIndex!!.image),
             contentDescription = null,
             modifier = Modifier
                 .size((100 * animatedScale).dp), // Применяем масштаб к размеру изображения
@@ -290,18 +292,24 @@ fun CaseResult(centerItemIndex: Int?, onClick: () -> Unit) {
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Card(
-                modifier = Modifier
-                    .width(320.dp)
-                    .height(80.dp)
-            ) {
-                Text(
-                    text = "CONGRATS!!!",
-                    fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
-                    fontSize = 50.sp,               // Используйте нужный размер шрифта
-                    color = Color.White
-                )
-            }
+            Text(
+                text = centerItemIndex!!.name,
+                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
+                fontSize = 50.sp,               // Используйте нужный размер шрифта
+                color = Color.White
+            )
+            Text(
+                text = centerItemIndex!!.rarity,
+                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
+                fontSize = 50.sp,               // Используйте нужный размер шрифта
+                color = Color.White
+            )
+            Text(
+                text = centerItemIndex!!.coast.toString(),
+                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
+                fontSize = 50.sp,               // Используйте нужный размер шрифта
+                color = Color.White
+            )
 
         }
     }
