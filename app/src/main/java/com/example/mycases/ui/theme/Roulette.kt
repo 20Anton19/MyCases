@@ -35,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mycases.R
-import com.example.mycases.images
 
 @Composable
 fun Roulette(onClick2: () -> Unit) {

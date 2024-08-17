@@ -1,7 +1,9 @@
 package com.example.mycases
 
+import android.content.Context
 import android.graphics.fonts.FontFamily
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,13 +25,16 @@ import kotlinx.coroutines.launch
 
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -38,43 +43,59 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import org.json.JSONException
+import org.json.JSONObject
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
+import java.io.IOException
 
 ///////Списки картинок оружия по цветам(редкости)///////
 val milspecList = listOf(
-    WeaponData(R.drawable.ssg, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.nova, 3600, "Nova", "mil-spec"),
-    WeaponData(R.drawable.ump45, 3600, "Ump-45", "mil-spec"),
-    WeaponData(R.drawable.xm1014, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.tec9, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.ssg, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.mac10, 3600, "SSG", "mil-spec")
+    WeaponData(R.drawable.ssg, 3600, "SSG", "Армейское", 0.0f),
+    WeaponData(R.drawable.nova, 3600, "Nova", "Армейское", 0.0f),
+    WeaponData(R.drawable.ump45, 3600, "Ump-45", "Армейское", 0.0f),
+    WeaponData(R.drawable.xm1014, 3600, "XM1014", "Армейское", 0.0f),
+    WeaponData(R.drawable.tec9, 3600, "TEC-9", "Армейское", 0.0f),
+    WeaponData(R.drawable.ssg, 3600, "SSG", "Армейское", 0.0f),
+    WeaponData(R.drawable.mac10, 3600, "Mac-10", "Армейское", 0.0f)
 )
 val restrictedList = listOf(
-    WeaponData(R.drawable.sawedoff, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.mp7, 3600, "Nova", "mil-spec"),
-    WeaponData(R.drawable.fiveseven, 3600, "Ump-45", "mil-spec"),
-    WeaponData(R.drawable.m4a4, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.glock18, 3600, "SSG", "mil-spec")
+    WeaponData(R.drawable.sawedoff, 3600, "Sawedoff", "Запрещённое", 0.0f),
+    WeaponData(R.drawable.mp7, 3600, "MP-7", "Запрещённое", 0.0f),
+    WeaponData(R.drawable.fiveseven, 3600, "Fiveseven", "Запрещённое", 0.0f),
+    WeaponData(R.drawable.m4a4, 3600, "M4A4", "Запрещённое", 0.0f),
+    WeaponData(R.drawable.glock18, 3600, "Glock-18", "Запрещённое", 0.0f)
 )
 val classifiedList = listOf(
-    WeaponData(R.drawable.zeusx27, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.usps, 3600, "Nova", "mil-spec"),
-    WeaponData(R.drawable.m4a4s, 3600, "Ump-45", "mil-spec")
+    WeaponData(R.drawable.zeusx27, 3600, "Zeusx27", "Засекреченное", 0.0f),
+    WeaponData(R.drawable.usps, 3600, "Usp-s", "Засекреченное", 0.0f),
+    WeaponData(R.drawable.m4a4s, 3600, "M4A4-s", "Засекреченное", 0.0f)
 )
 val covertList = listOf(
-    WeaponData(R.drawable.awp, 3600, "SSG", "mil-spec"),
-    WeaponData(R.drawable.ak47, 3600, "Nova", "mil-spec")
+    WeaponData(R.drawable.awp, 3600, "AWP", "Тайное", 0.0f),
+    WeaponData(R.drawable.ak47, 3600, "AK-47", "Тайное", 0.0f)
 )
 val exceedingly_rareList = listOf(
-    WeaponData(R.drawable.ssg, 3600, "SSG", "mil-spec")
+    WeaponData(R.drawable.ssg, 3600, "Кукри", "Необычайно редкое", 0.0f)
 )
-
 
 ////////Сам алгоритм рандома////////////////////
 fun randomWeapon(): WeaponData {
-    var weapon = WeaponData(R.drawable.ssg, 0, "Шаблон", "Шаблон")
+    var weapon = WeaponData(R.drawable.ssg, 0, "Шаблон", "Шаблон", 0.0f)
     val choise = (0..9999).random()
+    var fvalueInt = (0..10000).random()
+    val fvalue = fvalueInt/10000.0f
     when (choise) {
         in 0..25 -> {
             weapon = exceedingly_rareList.random()
@@ -92,61 +113,13 @@ fun randomWeapon(): WeaponData {
             weapon = milspecList.random()
         }
     }
+    weapon.float_value = fvalue
     return weapon
 }
 ////////////////////////////////////////////////
 
-val images = listOf(
-    R.drawable.ak47,
-    R.drawable.awp,
-    R.drawable.fiveseven,
-    R.drawable.glock18,
-    R.drawable.m4a4,
-    R.drawable.m4a4s,
-    R.drawable.mac10,
-    R.drawable.mp7,
-    R.drawable.nova,
-    R.drawable.sawedoff,
-    R.drawable.ssg,
-    R.drawable.tec9,
-    R.drawable.ump45,
-    R.drawable.usps,
-    R.drawable.xm1014,
-    R.drawable.zeusx27,
-    R.drawable.ak47,
-    R.drawable.awp,
-    R.drawable.fiveseven,
-    R.drawable.glock18,
-    R.drawable.m4a4,
-    R.drawable.m4a4s,
-    R.drawable.mac10,
-    R.drawable.mp7,
-    R.drawable.nova,
-    R.drawable.sawedoff,
-    R.drawable.ssg,
-    R.drawable.tec9,
-    R.drawable.ump45,
-    R.drawable.usps,
-    R.drawable.xm1014,
-    R.drawable.zeusx27,
-    R.drawable.ak47,
-    R.drawable.awp,
-    R.drawable.fiveseven,
-    R.drawable.glock18,
-    R.drawable.m4a4,
-    R.drawable.m4a4s,
-    R.drawable.mac10,
-    R.drawable.mp7,
-    R.drawable.nova,
-    R.drawable.sawedoff,
-    R.drawable.ssg,
-    R.drawable.tec9,
-    R.drawable.ump45,
-    R.drawable.usps,
-    R.drawable.xm1014,
-    R.drawable.zeusx27
-)
 val weaponList = mutableStateListOf<WeaponData>()
+
 
 @Composable
 fun Case1(onClick: (Any?) -> Unit) {
@@ -154,15 +127,15 @@ fun Case1(onClick: (Any?) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
 
-    val context = LocalContext.current
+
     var lastIndex by remember { mutableStateOf(-1) }
+    val context = LocalContext.current
 
 
     LaunchedEffect(Unit) {
-        val itemSize = 25.dp
-
+        val itemSize = 1.dp
         val itemSizePx = with(density) { itemSize.toPx() }
-        val itemsScrollCount = (297..303).random()
+        val itemsScrollCount = (7430..7570).random()
         coroutineScope.launch {
             listState.animateScrollBy(
                 value = itemSizePx * itemsScrollCount,
@@ -250,7 +223,6 @@ fun CaseResult(centerItemIndex: WeaponData?, onClick: () -> Unit) {
     // Переменная состояния для масштаба изображения
     var scale by remember { mutableStateOf(1f) }
 
-
     // Анимируемый масштаб изображения
     val animatedScale by animateFloatAsState(
         targetValue = scale,
@@ -263,6 +235,13 @@ fun CaseResult(centerItemIndex: WeaponData?, onClick: () -> Unit) {
     LaunchedEffect(Unit) {
         scale = 3.5f // Целевой масштаб для анимации
     }
+
+    val brush =  Brush.horizontalGradient(
+        listOf(Color.Red, Color.Green, Color.Blue),
+        startX = 0.0f,
+        endX = 300.0f
+    )
+
     Image(
         painter = painterResource(id = R.drawable.bg_result_01),
         contentDescription = "mainbg",
@@ -310,7 +289,131 @@ fun CaseResult(centerItemIndex: WeaponData?, onClick: () -> Unit) {
                 fontSize = 50.sp,               // Используйте нужный размер шрифта
                 color = Color.White
             )
+            Text(
+                text = centerItemIndex!!.float_value.toString(),
+                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
+                fontSize = 50.sp,               // Используйте нужный размер шрифта
+                color = Color.White
+            )
 
         }
     }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(0.dp, 50.dp),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Box(
+            modifier = Modifier
+                .height(30.dp)
+                .width(300.dp)
+                .background(brush)
+        )
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+LaunchedEffect(Unit) {
+    withContext(Dispatchers.IO) {
+        try {
+            Log.d("MyComposable", "Starting getSkinPrice()")
+            getSkinPrice(context)
+        } catch (e: Exception) {
+            Log.e("MyComposable", "Error in getSkinPrice()", e)
+        }
+    }
+}
+
+fun getSkinPrice(): Int? {
+    val url = "https://steamcommunity.com/market/listings/730/StatTrak™%20Nova%20%7C%20Dark%20Sigil%20%28Minimal%20Wear%29"
+    //val url = "https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=tag_set_community_33&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_Tournament%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Type%5B%5D=any&category_730_Weapon%5B%5D=any&appid=730"
+    return try {
+        val doc = Jsoup.connect(url).get()
+        val element = doc.getElementById("market_commodity_buyrequests")
+
+
+        //val text = doc.select("span[class=market_page_fullwidth]")
+        // Находим элемент span с классом market_commodity_orders_header_promote
+        //val priceElement = doc.select("span.market_commodity_orders_header_promote")
+        // Получаем текстовое содержимое элемента
+        //val price = priceElement.first()?.text()
+        // Получение последнего элемента из найденных
+        //val initialPriceElement = text.size
+        // Извлечение текста из найденного элемента
+        //val initialPrice = initialPriceElement?.text()
+        //Log.d("PageNameLogger", "Current page: ${doc.title()}")
+        Log.d("PageNameLogger", "Current page: ${element!!.text()}")
+        Log.d("PageNameLogger", "Current page: ${element}")
+        Log.d("PageNameLogger", "Current page: жп")
+
+    } catch (e: IOException) {
+        e.printStackTrace()
+        null
+    }
+}
+
+
+fun getSkinPrice(context: Context) {
+    val apiKey = "6DF65BD9D30668BFEA9961E71835AF83"
+    val appID = "730"
+    val url = "https://api.steamapis.com/market/items/$appID?api_key=6DF65BD9D30668BFEA9961E71835AF83"
+
+    val requestQueue: RequestQueue = Volley.newRequestQueue(context)
+
+    val jsonObjectRequest = JsonObjectRequest(
+        Request.Method.GET, url, null,
+        { response ->
+            try {
+                // Проверяем, содержит ли ответ массив "items"
+                if (response.has("items")) {
+                    val items = response.getJSONArray("items")
+                    if (items.length() > 0) {
+                        val item = items.getJSONObject(0)
+                        if (item.has("price")) {
+                            val price = item.getString("price")
+                            Log.d("SkinPrice", "Цена: $price")
+                        } else {
+                            Log.e("SkinPrice", "Поле 'price' не найдено в ответе.")
+                        }
+                    } else {
+                        Log.e("SkinPrice", "Массив 'items' пустой.")
+                    }
+                } else {
+                    Log.e("SkinPrice", "Ответ не содержит массива 'items'.")
+                }
+            } catch (e: JSONException) {
+                Log.e("SkinPrice", "Ошибка парсинга JSON: ${e.message}")
+                e.printStackTrace()
+            }
+        },
+        { error ->
+            Log.e("SkinPrice", "Ошибка запроса: ${error.message}")
+
+            // Выводим информацию об ошибке в лог
+            error.networkResponse?.let {
+                Log.e("SkinPrice", "Код ошибки: ${it.statusCode}")
+                Log.e("SkinPrice", "Ответ от сервера: ${String(it.data)}")
+            }
+            error.printStackTrace()
+        }
+    )
+
+    requestQueue.add(jsonObjectRequest)
+}*/
