@@ -340,7 +340,7 @@ LaunchedEffect(Unit) {
         }
     }
 }
-
+/*
 fun getSkinPrice(): Int? {
     val url = "https://steamcommunity.com/market/listings/730/StatTrak™%20Nova%20%7C%20Dark%20Sigil%20%28Minimal%20Wear%29"
     //val url = "https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=tag_set_community_33&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_Tournament%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Type%5B%5D=any&category_730_Weapon%5B%5D=any&appid=730"
