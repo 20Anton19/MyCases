@@ -3,7 +3,9 @@ package com.example.mycases
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -52,6 +54,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -61,6 +66,26 @@ import com.google.gson.Gson
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /////////////////////УБИРАЕМ ЧЕРНЫЕ ПОЛОСЫ ПО БОКАМ И СВЕРХУ////////////////////////
+        // Настройка для полноэкранного отображения
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Установите прозрачный фон окна
+        // Настройка контроллера инсетов
+        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        // Устанавливаем использование вырезов (notches)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+        ///////////////////////////////////////////////////////////////////////////////
+
         setContent {
             val navController = rememberNavController()
             NavHost(
@@ -125,8 +150,8 @@ private fun MyApp(navController: NavController) {
 
     Box(
         modifier = Modifier
-            .background(color = Color.Green)
             .fillMaxSize()
+            .background(color = Color.Green)
     ){
         Scaffold(
             topBar = {

@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.mycases"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.17.0")
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("com.android.volley:volley:1.2.1")
