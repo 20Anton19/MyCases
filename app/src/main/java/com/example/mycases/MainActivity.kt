@@ -5,9 +5,11 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -57,9 +59,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.mycases.data.WeaponDatabase
 import com.example.mycases.ui.theme.Roulette
 import com.google.gson.Gson
 
@@ -85,6 +89,20 @@ class MainActivity : ComponentActivity() {
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
         ///////////////////////////////////////////////////////////////////////////////
+
+
+        val database = WeaponDatabase.getDatabase(this)
+        val weaponDao = database.weaponDao()
+
+        val weaponViewModel: WeaponViewModel by viewModels {
+            WeaponViewModel.Factory(weaponDao)
+        }
+
+        weaponDao.getAllInventory().observe(this, Observer { inventoryList ->
+            Log.d("WeaponViewModel", "Список оружий: $inventoryList")
+        })
+
+
 
         setContent {
             val navController = rememberNavController()
