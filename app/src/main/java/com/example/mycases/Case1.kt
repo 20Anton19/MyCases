@@ -49,6 +49,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.mycases.data.WeaponData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -59,8 +60,11 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 ///////Списки картинок оружия по цветам(редкости)///////
+/*
 val milspecList = listOf(
     WeaponData(R.drawable.ssg, 3600, "SSG", "Армейское", 0.0f),
     WeaponData(R.drawable.nova, 3600, "Nova", "Армейское", 0.0f),
@@ -89,32 +93,129 @@ val covertList = listOf(
 val exceedingly_rareList = listOf(
     WeaponData(R.drawable.ssg, 3600, "Кукри", "Необычайно редкое", 0.0f)
 )
-
-////////Сам алгоритм рандома////////////////////
-fun randomWeapon(): WeaponData {
-    var weapon = WeaponData(R.drawable.ssg, 0, "Шаблон", "Шаблон", 0.0f)
+*/
+private fun randomRarity(): String {
     val choise = (0..9999).random()
-    var fvalueInt = (0..10000).random()
-    val fvalue = fvalueInt/10000.0f
+    var rarity: String
     when (choise) {
         in 0..25 -> {
-            weapon = exceedingly_rareList.random()
+            rarity = "contraband"
         }
         in 26..89 -> {
-            weapon = covertList.random()
+            rarity = "secret"
         }
         in 90..409 -> {
-            weapon = classifiedList.random()
+            rarity = "classified"
         }
-        in 320..2007 -> {
-            weapon = restrictedList.random()
+        in 410..2007 -> {
+            rarity = "prohibited"
         }
-        in 1598..9999 -> {
-            weapon = milspecList.random()
+        in 2008..9999 -> {
+            rarity = "army"
+        }
+        else -> {
+            Log.d("WeaponFragment", "Выпала дичь какая-то: choise = $choise")
+            rarity = "Ошибка"
         }
     }
-    weapon.float_value = fvalue
-    return weapon
+    return rarity
+}
+
+private fun randomQuality(): String {
+    var fvalueInt = (0..10000).random()
+    var quality: String
+    when (fvalueInt) {
+        in 0..700 -> {
+            quality = "Factory_New"
+        }
+        in 701..1500 -> {
+            quality = "Minimal_Wear"
+        }
+        in 1501..3700 -> {
+            quality = "Field-Tested"
+        }
+        in 3701..4400 -> {
+            quality = "Well-Worn"
+        }
+        in 4401 ..10000 -> {
+            quality = "Battle-Scarred"
+        }
+        else -> {
+            Log.d("WeaponFragment", "Выпала дичь какая-то")
+            quality = "Ошибка"
+        }
+    }
+    return quality
+}
+////////Сам алгоритм рандома////////////////////
+suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
+    return suspendCoroutine { continuation ->
+        var weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", 10.0, true)
+        /*
+        val choise = (0..9999).random()
+        var fvalueInt = (0..10000).random()
+        var rarity: String
+        var quality: String
+        //val fvalue = fvalueInt/10000.0f
+        when (choise) {
+            in 0..25 -> {
+                rarity = "contraband"
+            }
+            in 26..89 -> {
+                rarity = "secret"
+            }
+            in 90..409 -> {
+                rarity = "classified"
+            }
+            in 410..2007 -> {
+                rarity = "prohibited"
+            }
+            in 2008..9999 -> {
+                rarity = "army"
+            }
+            else -> {
+                Log.d("WeaponFragment", "Выпала дичь какая-то: choise = $choise")
+                rarity = "Ошибка"
+            }
+        }
+        when (fvalueInt) {
+            in 0..700 -> {
+                quality = "Factory_New"
+            }
+            in 701..1500 -> {
+                quality = "Minimal_Wear"
+            }
+            in 1501..3700 -> {
+                quality = "Field-Tested"
+            }
+            in 3701..4400 -> {
+                quality = "Well-Worn"
+            }
+            in 4401 ..10000 -> {
+                quality = "Battle-Scarred"
+            }
+            else -> {
+                Log.d("WeaponFragment", "Выпала дичь какая-то: choise = $choise")
+                quality = "Ошибка"
+            }
+        }
+        */
+        //val rarity = randomRarity()
+        //val quality = randomQuality()
+
+        val rarity = "secret"
+        val quality = "Battle-Scarred"
+
+        weaponViewModel.getRandomWeaponVM(rarity, quality) { randWeapon ->
+            if (randWeapon == null) {
+                Log.d("WeaponFragment", "Такого оружия не нашлось")
+                continuation.resume(weapon)
+            } else {
+                Log.d("WeaponFragment", "Оружие: $randWeapon")
+                continuation.resume(randWeapon)
+            }
+        }
+    }
 }
 ////////////////////////////////////////////////
 
@@ -122,7 +223,7 @@ val weaponList = mutableStateListOf<WeaponData>()
 
 
 @Composable
-fun Case1(onClick: (Any?) -> Unit) {
+fun Case1(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -131,6 +232,8 @@ fun Case1(onClick: (Any?) -> Unit) {
     var lastIndex by remember { mutableStateOf(-1) }
     val context = LocalContext.current
 
+    // Хранение состояния загрузки
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         val itemSize = 1.dp
@@ -165,61 +268,92 @@ fun Case1(onClick: (Any?) -> Unit) {
         }
     }
 
-    // LazyRow with animated offset
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.bg_scroll_01),
-            contentDescription = "mainbg",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-        LazyRow(
-            state = listState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        ) {
-            repeat(47) {
-                weaponList.add(randomWeapon())
+    LaunchedEffect(Unit) {
+        repeat(47) {
+            // Получение оружия в асинхронной корутине
+            val weapon = withContext(Dispatchers.IO) {
+                randomWeapon(weaponViewModel)  // Асинхронный вызов
             }
-            items(47) { index ->
-                // запасной вариант, но вроде как более лагучий
-                //if (index >= weaponList.size) {
-                    // Добавляем новый элемент в список, если его еще нет
-                    //weaponList.add(randomWeapon())
-                //}
-                Image(
-                    painter = painterResource(id = weaponList[index].image),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .size(150.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
+            weaponList.add(weapon)  // Добавляем новое оружие в список
         }
-        Row( //пустой контейнер - витрина, чтобы не давать трогать lazyrow
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {},
-            horizontalArrangement = Arrangement.SpaceAround
+        isLoading = false  // Завершаем загрузку
+    }
 
-        ) {
+
+
+    if (isLoading) {
+        // Показываем индикатор загрузки, пока данные загружаются
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Image(
-                painter = painterResource(id = R.drawable.rectangle),
-                contentDescription = "mainbg",
+                painter = painterResource(id = R.drawable.mmm),
+                contentDescription = "mainmisha",
+                modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
         }
+    } else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.bg_scroll_01),
+                contentDescription = "mainbg",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            LazyRow(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            ) {
+                items(47) { index ->
+                    // запасной вариант, но вроде как более лагучий
+                    //if (index >= weaponList.size) {
+                    // Добавляем новый элемент в список, если его еще нет
+                    //weaponList.add(randomWeapon())
+                    //}
+                    val context = LocalContext.current
+                    val resourceId = context.resources.getIdentifier(weaponList[index].nameImg, "drawable", context.packageName)
+                    if (resourceId != 0) {
+                        Image(
+                            painter = painterResource(id = resourceId),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .size(150.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                    else {
+                        Text("Image not found", modifier = Modifier.padding(horizontal = 16.dp))
+                        Log.d("MyEx", "resourceId был нулевой")
+                    }
+
+                }
+            }
+            Row( //пустой контейнер - витрина, чтобы не давать трогать lazyrow
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {},
+                horizontalArrangement = Arrangement.SpaceAround
+
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.rectangle),
+                    contentDescription = "mainbg",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
     }
+
 }
 
 
 @Composable
-fun CaseResult(centerItemIndex: WeaponData?, onClick: () -> Unit) {
+fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
     // Переменная состояния для масштаба изображения
     var scale by remember { mutableStateOf(1f) }
 
@@ -253,8 +387,10 @@ fun CaseResult(centerItemIndex: WeaponData?, onClick: () -> Unit) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        val context = LocalContext.current
+        val resourceId = context.resources.getIdentifier(centerItemIndex!!.nameImg, "drawable", context.packageName)
         Image(
-            painter = painterResource(id = centerItemIndex!!.image),
+            painter = painterResource(id = resourceId),
             contentDescription = null,
             modifier = Modifier
                 .size((100 * animatedScale).dp), // Применяем масштаб к размеру изображения
@@ -279,18 +415,6 @@ fun CaseResult(centerItemIndex: WeaponData?, onClick: () -> Unit) {
             )
             Text(
                 text = centerItemIndex!!.rarity,
-                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
-                fontSize = 50.sp,               // Используйте нужный размер шрифта
-                color = Color.White
-            )
-            Text(
-                text = centerItemIndex!!.coast.toString(),
-                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
-                fontSize = 50.sp,               // Используйте нужный размер шрифта
-                color = Color.White
-            )
-            Text(
-                text = centerItemIndex!!.float_value.toString(),
                 fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
                 fontSize = 50.sp,               // Используйте нужный размер шрифта
                 color = Color.White

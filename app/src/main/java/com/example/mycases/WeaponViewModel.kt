@@ -1,6 +1,7 @@
 package com.example.mycases
 
 import android.util.Log
+import androidx.core.location.LocationRequestCompat.Quality
 import androidx.lifecycle.*
 import com.example.mycases.data.Inventory
 import com.example.mycases.data.WeaponDao
@@ -13,11 +14,24 @@ class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
 
     val weaponList: LiveData<List<WeaponData>> = weaponDao.getAllWeapons()
 
+        /*
     fun addRandomWeapon() {
         viewModelScope.launch {
             val randomWeapon = weaponDao.getRandomWeapon()
             val newInventoryItem = Inventory(id = 0, weaponId = randomWeapon.id)
             weaponDao.insertOrUpdateInventory(newInventoryItem)
+        }
+    }
+    */
+    fun getRandomWeaponVM(rarity: String, quality: String, onResult: (WeaponData?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val randomWeapon = weaponDao.getRandomWeapon(rarity, quality)
+                onResult(randomWeapon)
+            } catch (e: Exception) {
+                Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")
+                onResult(null)
+            }
         }
     }
 

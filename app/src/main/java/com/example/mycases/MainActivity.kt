@@ -63,6 +63,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.mycases.data.WeaponData
 import com.example.mycases.data.WeaponDatabase
 import com.example.mycases.ui.theme.Roulette
 import com.google.gson.Gson
@@ -99,9 +100,12 @@ class MainActivity : ComponentActivity() {
         }
 
         weaponDao.getAllInventory().observe(this, Observer { inventoryList ->
-            Log.d("WeaponViewModel", "Список оружий: $inventoryList")
+            Log.d("WeaponViewModel", "Инвентарь: $inventoryList")
         })
 
+        weaponDao.getAllWeapons().observe(this, Observer { WeaponList ->
+            Log.d("WeaponViewModel", "Список оружий: $WeaponList")
+        })
 
 
         setContent {
@@ -111,11 +115,11 @@ class MainActivity : ComponentActivity() {
                 startDestination = "screen_1"
             ){
                 composable("screen_1"){
-                    MyApp(navController)
+                    MyApp(navController, weaponViewModel)
                 }
                 // Экран 2: Передача объекта WeaponData
                 composable("screen_2") {
-                    Case1 { resultWeapon ->
+                    Case1(weaponViewModel) { resultWeapon ->
                         val weaponJson = Uri.encode(Gson().toJson(resultWeapon))
                         navController.navigate("screen_3/$weaponJson")
                     }
@@ -128,7 +132,7 @@ class MainActivity : ComponentActivity() {
                 ) { backStackEntry ->
                     val weaponJson = backStackEntry.arguments?.getString("resultWeapon")
                     val resultWeapon = Gson().fromJson(weaponJson, WeaponData::class.java)
-                    CaseResult(resultWeapon) {
+                    CaseResult(resultWeapon, weaponViewModel) {
                         navController.navigate("screen_1")
                     }
                 }
@@ -148,7 +152,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-private fun MyApp(navController: NavController) {
+private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel) {
     val infiniteTransition = rememberInfiniteTransition()
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
