@@ -21,7 +21,7 @@ abstract class WeaponDatabase : RoomDatabase() {
                     WeaponDatabase::class.java,
                     "weapon_database"
                 )
-                .createFromAsset("wb3.db")
+                .createFromAsset("wb5.db")
                 .build()
                 INSTANCE = instance
                 instance

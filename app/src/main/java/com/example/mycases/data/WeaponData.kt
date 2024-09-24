@@ -12,11 +12,12 @@ import android.os.Parcelable
 @Entity(tableName = "weapon_table")
 data class WeaponData(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val nameImg: String,
     val name: String,
+    val skin: String,
     val weaponCase: String,
     val rarity: String,
     val quality: String,
+    val qualityRu: String,
     val price: Double,
     val statTrack: Boolean
 ) : Parcelable

@@ -99,19 +99,19 @@ private fun randomRarity(): String {
     var rarity: String
     when (choise) {
         in 0..25 -> {
-            rarity = "contraband"
+            rarity = "Contraband"
         }
         in 26..89 -> {
-            rarity = "secret"
+            rarity = "Covert"
         }
         in 90..409 -> {
-            rarity = "classified"
+            rarity = "Classified"
         }
         in 410..2007 -> {
-            rarity = "prohibited"
+            rarity = "Restricted"
         }
         in 2008..9999 -> {
-            rarity = "army"
+            rarity = "Mil-Spec"
         }
         else -> {
             Log.d("WeaponFragment", "Выпала дичь какая-то: choise = $choise")
@@ -150,7 +150,7 @@ private fun randomQuality(): String {
 ////////Сам алгоритм рандома////////////////////
 suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
     return suspendCoroutine { continuation ->
-        var weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", 10.0, true)
+        var weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",10.0, true)
         /*
         val choise = (0..9999).random()
         var fvalueInt = (0..10000).random()
@@ -203,7 +203,7 @@ suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
         //val rarity = randomRarity()
         //val quality = randomQuality()
 
-        val rarity = "secret"
+        val rarity = "Covert"
         val quality = "Battle-Scarred"
 
         weaponViewModel.getRandomWeaponVM(rarity, quality) { randWeapon ->
@@ -221,6 +221,21 @@ suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
 
 val weaponList = mutableStateListOf<WeaponData>()
 
+fun sanitizeString(input: String): String {
+    var imgName = input
+    // Проверяем, содержит ли строка символ '-'
+    if (imgName.contains('-')) {
+        // Если содержит, удаляем все символы '-'
+        imgName = imgName.replace("-", "")
+    }
+    // Проверяем, содержит ли строка символ ' '
+    if (imgName.contains(' ')) {
+        // Если содержит, удаляем все символы ' '
+        imgName = imgName.replace(" ", "")
+    }
+    // Если не содержит, возвращаем исходную строку
+    return imgName.lowercase()
+}
 
 @Composable
 fun Case1(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
@@ -280,7 +295,6 @@ fun Case1(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     }
 
 
-
     if (isLoading) {
         // Показываем индикатор загрузки, пока данные загружаются
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -315,7 +329,8 @@ fun Case1(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
                     //weaponList.add(randomWeapon())
                     //}
                     val context = LocalContext.current
-                    val resourceId = context.resources.getIdentifier(weaponList[index].nameImg, "drawable", context.packageName)
+                    var imgName = sanitizeString(weaponList[index].name + "__" + weaponList[index].skin)
+                    val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
                     if (resourceId != 0) {
                         Image(
                             painter = painterResource(id = resourceId),
@@ -388,14 +403,21 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
         contentAlignment = Alignment.Center
     ) {
         val context = LocalContext.current
-        val resourceId = context.resources.getIdentifier(centerItemIndex!!.nameImg, "drawable", context.packageName)
-        Image(
-            painter = painterResource(id = resourceId),
-            contentDescription = null,
-            modifier = Modifier
-                .size((100 * animatedScale).dp), // Применяем масштаб к размеру изображения
-            contentScale = ContentScale.Fit
-        )
+        var imgName = sanitizeString(centerItemIndex!!.name + "__" + centerItemIndex!!.skin)
+        val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
+        if (resourceId != 0) {
+            Image(
+                painter = painterResource(id = resourceId),
+                contentDescription = null,
+                modifier = Modifier
+                    .size((100 * animatedScale).dp), // Применяем масштаб к размеру изображения
+                contentScale = ContentScale.Fit
+            )
+        }
+        else {
+        Text("Image not found", modifier = Modifier.padding(horizontal = 16.dp))
+        Log.d("MyEx", "resourceId был нулевой")
+        }
     }
     Row(
         modifier = Modifier
