@@ -126,10 +126,10 @@ private fun randomQuality(): String {
     var quality: String
     when (fvalueInt) {
         in 0..700 -> {
-            quality = "Factory_New"
+            quality = "Factory New"
         }
         in 701..1500 -> {
-            quality = "Minimal_Wear"
+            quality = "Minimal Wear"
         }
         in 1501..3700 -> {
             quality = "Field-Tested"
@@ -200,15 +200,15 @@ suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
             }
         }
         */
-        //val rarity = randomRarity()
-        //val quality = randomQuality()
+        val rarity = randomRarity()
+        val quality = randomQuality()
 
-        val rarity = "Covert"
-        val quality = "Battle-Scarred"
+        //val rarity = "Covert"
+        //val quality = "Battle-Scarred"
 
         weaponViewModel.getRandomWeaponVM(rarity, quality) { randWeapon ->
             if (randWeapon == null) {
-                Log.d("WeaponFragment", "Такого оружия не нашлось")
+                Log.d("WeaponFragment", "Такого оружия не нашлось + $rarity + $quality")
                 continuation.resume(weapon)
             } else {
                 Log.d("WeaponFragment", "Оружие: $randWeapon")
@@ -231,7 +231,7 @@ fun sanitizeString(input: String): String {
     // Проверяем, содержит ли строка символ ' '
     if (imgName.contains(' ')) {
         // Если содержит, удаляем все символы ' '
-        imgName = imgName.replace(" ", "")
+        imgName = imgName.replace(" ", "_")
     }
     // Если не содержит, возвращаем исходную строку
     return imgName.lowercase()
@@ -343,7 +343,7 @@ fun Case1(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
                     }
                     else {
                         Text("Image not found", modifier = Modifier.padding(horizontal = 16.dp))
-                        Log.d("MyEx", "resourceId был нулевой")
+                        Log.d("MyEx", "resourceId был нулевой + $imgName")
                     }
 
                 }
@@ -441,7 +441,18 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
                 fontSize = 50.sp,               // Используйте нужный размер шрифта
                 color = Color.White
             )
-
+            Text(
+                text = centerItemIndex!!.price.toString(),
+                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
+                fontSize = 50.sp,               // Используйте нужный размер шрифта
+                color = Color.White
+            )
+            Text(
+                text = centerItemIndex!!.qualityRu,
+                fontWeight = FontWeight.ExtraBold,  // Используйте нужный вес шрифта
+                fontSize = 30.sp,               // Используйте нужный размер шрифта
+                color = Color.White
+            )
         }
     }
     Box(
