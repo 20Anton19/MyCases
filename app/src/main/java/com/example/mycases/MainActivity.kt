@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
                 }
                 // Экран 2: Передача объекта WeaponData
                 composable("screen_2") {
-                    Case1(weaponViewModel) { resultWeapon ->
+                    CaseOpening(weaponViewModel) { resultWeapon ->
                         val weaponJson = Uri.encode(Gson().toJson(resultWeapon))
                         navController.navigate("screen_3/$weaponJson")
                     }
