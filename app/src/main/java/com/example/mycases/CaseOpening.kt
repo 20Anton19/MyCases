@@ -122,10 +122,9 @@ private suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
     }
 }
 
-private suspend fun preloadImages(context: Context, weaponList: List<WeaponData>): List<WeaponImage> {
+private suspend fun preloadImages(context: Context, weaponList: List<WeaponData>): List<Int> {
     val preloadedImages = weaponList.map { weapon ->
-        val imgName = SanitizeString.sanitizeString(weapon.name + "__" + weapon.skin)
-        val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
+        val resourceId = ResourceGenerator.getResourceId(context, weapon.name, weapon.skin)
         if (resourceId != 0) {
             // Предзагрузка с помощью Coil
             ImageRequest.Builder(context)
@@ -134,12 +133,10 @@ private suspend fun preloadImages(context: Context, weaponList: List<WeaponData>
                 .build()
                 .let { request -> Coil.imageLoader(context).enqueue(request) }
         }
-        WeaponImage(imgName, resourceId)
+        resourceId
     }
     return preloadedImages
 }
-
-private data class WeaponImage(val imgName: String, val resourceId: Int)
 
 @Composable
 fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
@@ -149,7 +146,7 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     val context = LocalContext.current
     var lastIndex by remember { mutableStateOf(-1) }
     var isLoading by remember { mutableStateOf(true) }
-    var preloadedImages by remember { mutableStateOf(listOf<WeaponImage>()) }
+    var preloadedImages by remember { mutableStateOf(listOf<Int>()) }
 
     LaunchedEffect(Unit) {
         val itemSize = 1.dp
@@ -233,11 +230,11 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
                     //weaponList.add(randomWeapon())
                     //}
                     val weaponImage = preloadedImages[index]
-                    if (weaponImage.resourceId != 0) {
+                    if (weaponImage != 0) {
                         Image(
                             //painter = painterResource(id = resourceId),
                             //Coil
-                            painter = rememberImagePainter(data = weaponImage.resourceId),
+                            painter = rememberImagePainter(data = weaponImage),
 
                             contentDescription = null,
                             modifier = Modifier
@@ -270,7 +267,130 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     }
 }
 
+/*
+@Composable
+fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    val context = LocalContext.current
+    var lastIndex by remember { mutableStateOf(-1) }
+    var isLoading by remember { mutableStateOf(true) }
 
+    LaunchedEffect(Unit) {
+        val itemSize = 1.dp
+        val itemSizePx = with(density) { itemSize.toPx() }
+        val itemsScrollCount = (7430..7570).random()
+        coroutineScope.launch {
+            listState.animateScrollBy(
+                value = itemSizePx * itemsScrollCount,
+                animationSpec = tween(durationMillis = 12000, easing = LinearOutSlowInEasing)
+            )
+
+            // Calculate the center position
+            val center = listState.layoutInfo.viewportEndOffset / 2
+
+            // Find the item closest to the center
+            var centerItemIndex = listState.layoutInfo.visibleItemsInfo.minByOrNull {
+                Math.abs(it.offset + it.size / 2 - center)
+            }?.index
+
+            delay(300) // задержка
+            onClick(weaponList[43])
+        }
+
+    }
+
+    LaunchedEffect(listState.firstVisibleItemIndex+2) {
+        if (listState.firstVisibleItemIndex != lastIndex) {
+            lastIndex = listState.firstVisibleItemIndex
+            val mediaPlayer = MediaPlayer.create(context, R.raw.case_sound)
+            mediaPlayer.start()
+            mediaPlayer.setOnCompletionListener { it.release() }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        repeat(47) {
+            // Получение оружия в асинхронной корутине
+            val weapon = withContext(Dispatchers.IO) {
+                randomWeapon(weaponViewModel)  // Асинхронный вызов
+            }
+            weaponList.add(weapon)  // Добавляем новое оружие в список
+        }
+        isLoading = false  // Завершаем загрузку
+    }
+
+    if (isLoading) {
+        // Показываем индикатор загрузки, пока данные загружаются
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Image(
+                painter = painterResource(id = R.drawable.mmm),
+                contentDescription = "mainmisha",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
+    else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.bg_scroll_01),
+                contentDescription = "mainbg",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            LazyRow(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            ) {
+                items(47) { index ->
+                    // запасной вариант, но вроде как более лагучий
+                    //if (index >= weaponList.size) {
+                    // Добавляем новый элемент в список, если его еще нет
+                    //weaponList.add(randomWeapon())
+                    //}
+                    val imgName = SanitizeString.sanitizeString(weaponList[index].name + "__" + weaponList[index].skin)
+                    val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
+                    if (resourceId != 0) {
+                        Image(
+                            painter = painterResource(id = resourceId),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .size(150.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                    else {
+                        Text("Image not found", modifier = Modifier.padding(horizontal = 16.dp))
+                        Log.d("MyEx", "resourceId был нулевой + $imgName")
+                    }
+
+                }
+            }
+            Row( //пустой контейнер - витрина, чтобы не давать трогать lazyrow
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {},
+                horizontalArrangement = Arrangement.SpaceAround
+
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.rectangle),
+                    contentDescription = "mainbg",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+    }
+}
+ */
 
 /*
 LaunchedEffect(Unit) {

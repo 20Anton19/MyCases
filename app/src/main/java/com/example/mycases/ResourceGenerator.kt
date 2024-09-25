@@ -1,8 +1,15 @@
 package com.example.mycases
 
-class SanitizeString() {
+import android.content.Context
+
+class ResourceGenerator() {
+
     companion object {
-        fun sanitizeString(input: String): String {
+        fun getResourceId(context: Context, name: String, skin: String): Int {
+            val imgName = sanitizeString(name + "__" + skin)
+            return context.resources.getIdentifier(imgName, "drawable", context.packageName)
+        }
+        private fun sanitizeString(input: String): String {
             var imgName = input
             // Проверяем, содержит ли строка символ '-'
             if (imgName.contains('-')) {

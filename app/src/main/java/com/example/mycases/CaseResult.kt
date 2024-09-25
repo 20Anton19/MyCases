@@ -72,8 +72,7 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
         contentAlignment = Alignment.Center
     ) {
         val context = LocalContext.current
-        val imgName = SanitizeString.sanitizeString(centerItemIndex!!.name + "__" + centerItemIndex!!.skin)
-        val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
+        val resourceId = ResourceGenerator.getResourceId(context, centerItemIndex!!.name, centerItemIndex.skin)
         if (resourceId != 0) {
             Image(
                 painter = painterResource(id = resourceId),
