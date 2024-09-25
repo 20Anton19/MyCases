@@ -10,11 +10,11 @@ import kotlinx.coroutines.launch
 
 class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
 
-    val inventory: LiveData<List<Inventory>> = weaponDao.getAllInventory()
+    //private val inventory: LiveData<List<Inventory>> = weaponDao.getAllInventory()
 
-    val weaponList: LiveData<List<WeaponData>> = weaponDao.getAllWeapons()
+    //private val weaponList: LiveData<List<WeaponData>> = weaponDao.getAllWeapons()
 
-        /*
+    /*
     fun addRandomWeapon() {
         viewModelScope.launch {
             val randomWeapon = weaponDao.getRandomWeapon()
@@ -34,7 +34,7 @@ class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
             }
         }
     }
-
+/*
     fun checkWeapons() {
         weaponList.observeForever { weaponL ->
             if (weaponL.isNullOrEmpty()) {
@@ -64,6 +64,8 @@ class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
             emit(weaponDao.getWeaponById(weaponId))
         }
     }
+
+ */
 /*
     fun addRandomWeapon() {
         viewModelScope.launch {

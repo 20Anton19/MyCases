@@ -42,11 +42,11 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-val weaponList = mutableStateListOf<WeaponData>()
+private val weaponList = mutableStateListOf<WeaponData>()
 private fun randomRarity(): String {
-    val choise = (0..9999).random()
-    var rarity: String
-    when (choise) {
+    val choice = (0..9999).random()
+    val rarity: String
+    when (choice) {
         in 0..25 -> {
             rarity = "Contraband"
         }
@@ -63,7 +63,7 @@ private fun randomRarity(): String {
             rarity = "Mil-Spec"
         }
         else -> {
-            Log.d("WeaponFragment", "Выпала дичь какая-то: choise = $choise")
+            Log.d("WeaponFragment", "Выпала дичь какая-то: choise = $choice")
             rarity = "Ошибка"
         }
     }
@@ -71,9 +71,9 @@ private fun randomRarity(): String {
 }
 
 private fun randomQuality(): String {
-    var fvalueInt = (0..10000).random()
-    var quality: String
-    when (fvalueInt) {
+    val fValueInt = (0..10000).random()
+    val quality: String
+    when (fValueInt) {
         in 0..700 -> {
             quality = "Factory New"
         }
@@ -99,7 +99,7 @@ private fun randomQuality(): String {
 
 private suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
     return suspendCoroutine { continuation ->
-        var weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",10.0, true)
+        val weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",10.0, true)
         val rarity = randomRarity()
         val quality = randomQuality()
 
@@ -205,8 +205,7 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
                     // Добавляем новый элемент в список, если его еще нет
                     //weaponList.add(randomWeapon())
                     //}
-                    val context = LocalContext.current
-                    var imgName = SanitizeString.sanitizeString(weaponList[index].name + "__" + weaponList[index].skin)
+                    val imgName = SanitizeString.sanitizeString(weaponList[index].name + "__" + weaponList[index].skin)
                     val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
                     if (resourceId != 0) {
                         Image(

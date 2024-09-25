@@ -7,13 +7,10 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [WeaponData::class, Inventory::class], version = 1, exportSchema = false)
 abstract class WeaponDatabase : RoomDatabase() {
-
     abstract fun weaponDao(): WeaponDao
-
     companion object {
         @Volatile
         private var INSTANCE: WeaponDatabase? = null
-
         fun getDatabase(context: Context): WeaponDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
