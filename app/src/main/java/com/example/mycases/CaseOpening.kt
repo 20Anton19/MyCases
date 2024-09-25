@@ -1,5 +1,6 @@
 package com.example.mycases
 
+import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -35,6 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import coil.Coil
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.example.mycases.data.WeaponData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -118,6 +122,25 @@ private suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
     }
 }
 
+private suspend fun preloadImages(context: Context, weaponList: List<WeaponData>): List<WeaponImage> {
+    val preloadedImages = weaponList.map { weapon ->
+        val imgName = SanitizeString.sanitizeString(weapon.name + "__" + weapon.skin)
+        val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
+        if (resourceId != 0) {
+            // Предзагрузка с помощью Coil
+            ImageRequest.Builder(context)
+                .data(resourceId)
+                .allowHardware(false)
+                .build()
+                .let { request -> Coil.imageLoader(context).enqueue(request) }
+        }
+        WeaponImage(imgName, resourceId)
+    }
+    return preloadedImages
+}
+
+private data class WeaponImage(val imgName: String, val resourceId: Int)
+
 @Composable
 fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     val listState = rememberLazyListState()
@@ -126,6 +149,7 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     val context = LocalContext.current
     var lastIndex by remember { mutableStateOf(-1) }
     var isLoading by remember { mutableStateOf(true) }
+    var preloadedImages by remember { mutableStateOf(listOf<WeaponImage>()) }
 
     LaunchedEffect(Unit) {
         val itemSize = 1.dp
@@ -168,6 +192,9 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
             }
             weaponList.add(weapon)  // Добавляем новое оружие в список
         }
+        preloadedImages = withContext(Dispatchers.IO) {
+            preloadImages(context, weaponList)
+        }
         isLoading = false  // Завершаем загрузку
     }
 
@@ -205,11 +232,13 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
                     // Добавляем новый элемент в список, если его еще нет
                     //weaponList.add(randomWeapon())
                     //}
-                    val imgName = SanitizeString.sanitizeString(weaponList[index].name + "__" + weaponList[index].skin)
-                    val resourceId = context.resources.getIdentifier(imgName, "drawable", context.packageName)
-                    if (resourceId != 0) {
+                    val weaponImage = preloadedImages[index]
+                    if (weaponImage.resourceId != 0) {
                         Image(
-                            painter = painterResource(id = resourceId),
+                            //painter = painterResource(id = resourceId),
+                            //Coil
+                            painter = rememberImagePainter(data = weaponImage.resourceId),
+
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
@@ -219,7 +248,7 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
                     }
                     else {
                         Text("Image not found", modifier = Modifier.padding(horizontal = 16.dp))
-                        Log.d("MyEx", "resourceId был нулевой + $imgName")
+                            //Log.d("MyEx", "resourceId был нулевой + $imgName")
                     }
 
                 }
