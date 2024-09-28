@@ -180,7 +180,7 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
             mediaPlayer.setOnCompletionListener { it.release() }
         }
     }
-
+        //ddfffdfddfdffd
     LaunchedEffect(Unit) {
         repeat(47) {
             // Получение оружия в асинхронной корутине
