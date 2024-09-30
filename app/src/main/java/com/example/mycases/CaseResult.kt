@@ -33,10 +33,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mycases.data.Inventory
 import com.example.mycases.data.WeaponData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
+    LaunchedEffect(Unit){
+        val weapon = Inventory(0, centerItemIndex!!.id)
+        withContext(Dispatchers.IO) {
+            weaponViewModel.insertWeaponToInventory(weapon)
+        }
+    }
 
     val brush =  Brush.horizontalGradient(
         listOf(Color.Red, Color.Green, Color.Blue),

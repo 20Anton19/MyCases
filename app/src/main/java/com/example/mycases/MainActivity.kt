@@ -141,6 +141,11 @@ class MainActivity : ComponentActivity() {
                         navController.navigate("screen_1")
                     }
                 }
+                composable("screen_5"){
+                    MyInventory(weaponViewModel) {
+                        navController.navigate("screen_1")
+                    }
+                }
             }
 
         }
@@ -251,7 +256,7 @@ private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel
                                 .width(150.dp)
                                 .height(100.dp)
                                 .clickable {
-                                    navController.navigate("screen_2")
+                                    navController.navigate("screen_5")
                                 }
                                 .graphicsLayer(rotationZ = angle)
                         ) {

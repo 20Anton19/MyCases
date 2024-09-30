@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 
 class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
 
-    //private val inventory: LiveData<List<Inventory>> = weaponDao.getAllInventory()
+    private val inventory: LiveData<List<Inventory>> = weaponDao.getAllInventory()
 
-    //private val weaponList: LiveData<List<WeaponData>> = weaponDao.getAllWeapons()
+    private val weaponList: LiveData<List<WeaponData>> = weaponDao.getAllWeapons()
 
     /*
     fun addRandomWeapon() {
@@ -32,6 +32,33 @@ class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
                 Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")
                 onResult(null)
             }
+        }
+    }
+
+    fun getWeaponVM1(id: Int, onResult: (WeaponData?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val weapon = weaponDao.getWeaponById(id)
+                onResult(weapon)
+            } catch (e: Exception) {
+                Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")
+                onResult(null)
+            }
+        }
+    }
+
+
+    suspend fun getWeaponVM(id: Int): WeaponData {
+        return weaponDao.getWeaponById(id)
+    }
+
+    fun getInventoryVM(): LiveData<List<Inventory>> {
+        return inventory
+    }
+
+    fun insertWeaponToInventory(inventory: Inventory) {
+        viewModelScope.launch {
+            weaponDao.insertOrUpdateInventory(inventory)
         }
     }
 /*

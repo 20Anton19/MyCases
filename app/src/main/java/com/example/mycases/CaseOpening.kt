@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-private val weaponList = mutableStateListOf<WeaponData>()
+//private val weaponList = mutableStateListOf<WeaponData>()
 private fun randomRarity(): String {
     val choice = (0..9999).random()
     val rarity: String
@@ -144,6 +144,7 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
     val context = LocalContext.current
+    val weaponList = remember { mutableStateListOf<WeaponData>() }
     var lastIndex by remember { mutableStateOf(-1) }
     var isLoading by remember { mutableStateOf(true) }
     var preloadedImages by remember { mutableStateOf(listOf<Int>()) }
@@ -152,34 +153,24 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
         val itemSize = 1.dp
         val itemSizePx = with(density) { itemSize.toPx() }
         val itemsScrollCount = (7430..7570).random()
-        coroutineScope.launch {
-            listState.animateScrollBy(
-                value = itemSizePx * itemsScrollCount,
-                animationSpec = tween(durationMillis = 12000, easing = LinearOutSlowInEasing)
-            )
+        listState.animateScrollBy(
+            value = itemSizePx * itemsScrollCount,
+            animationSpec = tween(durationMillis = 12000, easing = LinearOutSlowInEasing)
+        )
 
-            // Calculate the center position
-            val center = listState.layoutInfo.viewportEndOffset / 2
+        // Calculate the center position
+        val center = listState.layoutInfo.viewportEndOffset / 2
 
-            // Find the item closest to the center
-            var centerItemIndex = listState.layoutInfo.visibleItemsInfo.minByOrNull {
-                Math.abs(it.offset + it.size / 2 - center)
-            }?.index
+        // Find the item closest to the center
+        var centerItemIndex = listState.layoutInfo.visibleItemsInfo.minByOrNull {
+            Math.abs(it.offset + it.size / 2 - center)
+        }?.index
 
-            delay(300) // задержка
-            onClick(weaponList[43])
-        }
-
+        delay(300) // задержка
+        onClick(weaponList[43])
     }
 
-    LaunchedEffect(listState.firstVisibleItemIndex+2) {
-        if (listState.firstVisibleItemIndex != lastIndex) {
-            lastIndex = listState.firstVisibleItemIndex
-            val mediaPlayer = MediaPlayer.create(context, R.raw.case_sound)
-            mediaPlayer.start()
-            mediaPlayer.setOnCompletionListener { it.release() }
-        }
-    }
+
         //ddfffdfddfdffd
     LaunchedEffect(Unit) {
         repeat(47) {
@@ -196,7 +187,6 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
     }
 
     if (isLoading) {
-        // Показываем индикатор загрузки, пока данные загружаются
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Image(
                 painter = painterResource(id = R.drawable.mmm),

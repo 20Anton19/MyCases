@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mycases.R
 
+
 @Composable
 fun Roulette(onClick2: () -> Unit) {
     var angle by remember { mutableStateOf(0f) }
