@@ -78,7 +78,6 @@ fun MyInventory(weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
             )
         }
     } else {
-        key(weaponListWithDate) {
             rowsAmount = kotlin.math.floor(weaponListWithDate.size / 4.0).toInt()
             lastRowLen = (weaponListWithDate.size % 4.0).toInt()
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -120,7 +119,6 @@ fun MyInventory(weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
                     }
                 }
             }
-        }
 
 
         Column {
@@ -160,12 +158,56 @@ fun MyInventory(weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
             Button(
                 modifier = Modifier.height(30.dp),
                 onClick = {
+                    val filteredWeaponList = originalWeaponList.filter { it.first.rarity == "Mil-Spec" }
+                    weaponListWithDate.clear()
+                    weaponListWithDate.addAll(filteredWeaponList)
+                }
+            ) {
+                Text(text = "Фильтр по Mil-Spec")
+            }
+
+            Button(
+                modifier = Modifier.height(30.dp),
+                onClick = {
                     val filteredWeaponList = originalWeaponList.filter { it.first.rarity == "Restricted" }
                     weaponListWithDate.clear()
                     weaponListWithDate.addAll(filteredWeaponList)
                 }
             ) {
                 Text(text = "Фильтр по Restricted")
+            }
+
+            Button(
+                modifier = Modifier.height(30.dp),
+                onClick = {
+                    val filteredWeaponList = originalWeaponList.filter { it.first.rarity == "Classified" }
+                    weaponListWithDate.clear()
+                    weaponListWithDate.addAll(filteredWeaponList)
+                }
+            ) {
+                Text(text = "Фильтр по Classified")
+            }
+
+            Button(
+                modifier = Modifier.height(30.dp),
+                onClick = {
+                    val filteredWeaponList = originalWeaponList.filter { it.first.rarity == "Covert" }
+                    weaponListWithDate.clear()
+                    weaponListWithDate.addAll(filteredWeaponList)
+                }
+            ) {
+                Text(text = "Фильтр по Covert")
+            }
+
+            Button(
+                modifier = Modifier.height(30.dp),
+                onClick = {
+                    val filteredWeaponList = originalWeaponList.filter { it.first.rarity == "Contraband" }
+                    weaponListWithDate.clear()
+                    weaponListWithDate.addAll(filteredWeaponList)
+                }
+            ) {
+                Text(text = "Фильтр по Contraband")
             }
         }
     }
