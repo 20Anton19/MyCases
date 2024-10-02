@@ -16,12 +16,13 @@ lifecycleRuntimeKtx = "2.8.3"
 lifecycleViewmodelCompose = "2.8.4"
 lifecycleViewmodelKtx = "2.6.1"
 material3 = "1.0.0"
-navigationCompose = "2.5.3"
-roomCompiler = "2.5.0"
-roomRuntime = "2.5.1"
+navigationCompose = "2.8.0-beta05"
+roomCompiler = "2.6.1"
+roomRuntime = "2.6.1"
 runtimeLivedata = "1.4.3"
 volley = "1.2.1"
-kotlin = "1.7.20"
+kotlin = "1.9.0"
+serialization = "1.6.3"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -54,7 +55,9 @@ ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp"}
 jetbrainsKotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin"}
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

@@ -63,10 +63,26 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.mycases.data.WeaponData
 import com.example.mycases.data.WeaponDatabase
 import com.example.mycases.ui.theme.Roulette
 import com.google.gson.Gson
+import kotlinx.serialization.Serializable
+
+sealed class AppScreen {
+    @Serializable
+    object MainActivityScreen : AppScreen()
+
+    @Serializable
+    object CaseOpeningScreen : AppScreen()
+
+    @Serializable
+    data class CaseResultScreen(val resultWeapon: WeaponData) : AppScreen()
+
+    @Serializable
+    object MyInventoryScreen : AppScreen()
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,38 +128,17 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             NavHost(
                 navController = navController,
-                startDestination = "screen_1"
-            ){
-                composable("screen_1"){
-                    MyApp(navController, weaponViewModel)
-                }
-                // Экран 2: Передача объекта WeaponData
-                composable("screen_2") {
-                    CaseOpening(weaponViewModel) { resultWeapon ->
-                        val weaponJson = Uri.encode(Gson().toJson(resultWeapon))
-                        navController.navigate("screen_3/$weaponJson")
+                startDestination = AppScreen.MainActivityScreen
+            ) {
+                composable<AppScreen.MainActivityScreen> {
+                    MyApp(navController, weaponViewModel) {
+                        navController.navigate(AppScreen.MyInventoryScreen)
                     }
                 }
 
-                // Экран 3: Получение объекта WeaponData
-                composable(
-                    route = "screen_3/{resultWeapon}",
-                    arguments = listOf(navArgument("resultWeapon") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val weaponJson = backStackEntry.arguments?.getString("resultWeapon")
-                    val resultWeapon = Gson().fromJson(weaponJson, WeaponData::class.java)
-                    CaseResult(resultWeapon, weaponViewModel) {
-                        navController.navigate("screen_1")
-                    }
-                }
-                composable("screen_4"){
-                    Roulette{
-                        navController.navigate("screen_1")
-                    }
-                }
-                composable("screen_5"){
+                composable<AppScreen.MyInventoryScreen> {
                     MyInventory(weaponViewModel) {
-                        navController.navigate("screen_1")
+
                     }
                 }
             }
@@ -153,11 +148,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel) {
+private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition()
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -216,7 +210,7 @@ private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel
                                 .width(150.dp)
                                 .height(100.dp)
                                 .clickable {
-                                    navController.navigate("screen_2")
+                                    onClick()
                                 }
                                 .graphicsLayer(rotationZ = angle)
                         ) {
@@ -233,7 +227,7 @@ private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel
                                 .width(150.dp)
                                 .height(100.dp)
                                 .clickable {
-                                    navController.navigate("screen_4")
+                                    onClick()
                                 }
                                 .graphicsLayer(rotationZ = angle)
                         ) {
@@ -256,7 +250,7 @@ private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel
                                 .width(150.dp)
                                 .height(100.dp)
                                 .clickable {
-                                    navController.navigate("screen_5")
+                                    onClick()
                                 }
                                 .graphicsLayer(rotationZ = angle)
                         ) {
@@ -273,7 +267,7 @@ private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel
                                 .width(150.dp)
                                 .height(100.dp)
                                 .clickable {
-                                    navController.navigate("screen_2")
+                                    onClick()
                                 }
                                 .graphicsLayer(rotationZ = angle)
                         ) {

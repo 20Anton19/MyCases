@@ -139,7 +139,7 @@ private suspend fun preloadImages(context: Context, weaponList: List<WeaponData>
 }
 
 @Composable
-fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
+fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (WeaponData) -> Unit) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current

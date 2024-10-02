@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlin)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize")
     id("kotlin-kapt")
 }
@@ -42,7 +43,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = "1.5.0"
     }
     packaging {
         resources {
@@ -97,4 +98,8 @@ dependencies {
     //implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
 
     implementation (libs.runtime.livedata)
+
+    //Navigation
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 }
