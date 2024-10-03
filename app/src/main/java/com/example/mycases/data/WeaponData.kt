@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
 import kotlinx.serialization.Serializable
 
+@Parcelize
 @Serializable
 @Entity(tableName = "weapon_table")
 data class WeaponData(
@@ -21,7 +22,7 @@ data class WeaponData(
     val qualityRu: String,
     val price: Double,
     val statTrack: Boolean
-)
+): Parcelable
 
 @Entity(
     tableName = "inventory",
