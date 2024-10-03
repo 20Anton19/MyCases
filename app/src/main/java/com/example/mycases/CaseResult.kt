@@ -131,6 +131,14 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
                 fontSize = 30.sp,               // Используйте нужный размер шрифта
                 color = Color.White
             )
+            Button(
+                modifier = Modifier.height(30.dp),
+                onClick = {
+                    onClick()
+                }
+            ) {
+                Text(text = "Инвентарь")
+            }
         }
     }
     Box(

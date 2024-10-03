@@ -73,48 +73,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.reflect.typeOf
 
-sealed class AppScreen {
-    @Serializable
-    object MainActivityScreen : AppScreen()
-
-    @Serializable
-    object CaseOpeningScreen : AppScreen()
-
-    @Serializable
-    data class CaseResultScreen(val resultWeapon: WeaponData) : AppScreen()
-
-    @Serializable
-    object MyInventoryScreen : AppScreen()
-}
-
-val WeaponDataType = object : NavType<WeaponData>(false) {
-    override fun get(bundle: Bundle, key: String): WeaponData? {
-        return if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU) {
-            bundle.getParcelable(key, WeaponData::class.java)
-        } else {
-            bundle.getParcelable(key)
-        }
-     //return Json.decodeFromString(bundle.getString(key) ?: return null)
-    }
-
-
-    override fun parseValue(value: String): WeaponData {
-        // return Json.decodeFromString(Uri.encode(value))
-        return Json.decodeFromString(value)
-    }
-
-    override fun serializeAsValue(value: WeaponData): String {
-        // return Uri.encode(Json.encodeToString(value))
-        return Json.encodeToString(value)
-    }
-
-    override fun put(bundle: Bundle, key: String, value: WeaponData) {
-        // bundle.putString(key, Json.encodeToString(value))
-        bundle.putParcelable(key,value)
-    }
-
-}
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,9 +123,6 @@ class MainActivity : ComponentActivity() {
                     MyApp(navController, weaponViewModel)
                 }
 
-
-
-
                 composable<AppScreen.CaseOpeningScreen> {
                     CaseOpening(weaponViewModel) {
                         Log.d("NavigationGaz", "Navigating to CaseResultScreen with weapon: $it")
@@ -177,17 +132,16 @@ class MainActivity : ComponentActivity() {
 
                 composable<AppScreen.CaseResultScreen> (
                     typeMap = mapOf(
-                        typeOf<WeaponData>() to WeaponDataType
+                        typeOf<WeaponData>() to CustomNavType.WeaponDataType
                     )
                 ) {
                     val resultWeapon = it.arguments?.getParcelable<WeaponData>("resultWeapon")//вообще не так вроде надо, но работает
                     Log.d("NavigationGaz", "Received weapon in CaseResultScreen: $it")
                     CaseResult(resultWeapon, weaponViewModel) {
-
+                        navController.navigate(AppScreen.MyInventoryScreen) // OnClick для перехода в инвентарь
                     }
+
                 }
-
-
 
                 composable<AppScreen.MyInventoryScreen> {
                     MyInventory(weaponViewModel) {
