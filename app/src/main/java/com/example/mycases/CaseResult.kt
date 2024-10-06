@@ -40,14 +40,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
-    LaunchedEffect(Unit){
-        val weapon = Inventory(0, centerItemIndex!!.id)
-        withContext(Dispatchers.IO) {
-            weaponViewModel.insertWeaponToInventory(weapon)
-        }
-    }
-
+fun CaseResult(
+    centerItemIndex: WeaponData?,
+    weaponViewModel: WeaponViewModel,
+    onClickGoMyInventory: () -> Unit,
+    onClickGoPreCase: () -> Unit
+) {
     val brush =  Brush.horizontalGradient(
         listOf(Color.Red, Color.Green, Color.Blue),
         startX = 0.0f,
@@ -132,9 +130,9 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
                 color = Color.White
             )
             Button(
-                modifier = Modifier.height(30.dp),
+                modifier = Modifier.height(50.dp),
                 onClick = {
-                    onClick()
+                    onClickGoMyInventory()
                 }
             ) {
                 Text(text = "Инвентарь")
@@ -152,6 +150,21 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
                 .height(30.dp)
                 .width(300.dp)
                 .background(brush)
+        )
+    }
+    Button(
+        modifier = Modifier
+            .width(150.dp)
+            .height(100.dp),
+        onClick = {
+            onClickGoPreCase()
+        }
+    ) {
+        Text(
+            text = "Назад",
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 30.sp,
+            color = Color.White
         )
     }
 }

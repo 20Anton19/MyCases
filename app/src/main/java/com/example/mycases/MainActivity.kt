@@ -123,6 +123,27 @@ class MainActivity : ComponentActivity() {
                     MyApp(navController, weaponViewModel)
                 }
 
+                composable<AppScreen.PreCaseScreen> {
+                    PreCase(
+                        weaponViewModel = weaponViewModel,
+                        onClick = {
+                            navController.navigate(AppScreen.CaseOpeningScreen)
+                        },
+                        onClickShowInside = {
+                            navController.navigate(AppScreen.InsideTheCaseScreen)
+                        },
+                        onClickGoMainActivity = {
+                            navController.navigate(AppScreen.MainActivityScreen)
+                        }
+                    )
+                }
+
+                composable<AppScreen.InsideTheCaseScreen> {
+                    InsideTheCase(weaponViewModel){
+
+                    }
+                }
+
                 composable<AppScreen.CaseOpeningScreen> {
                     CaseOpening(weaponViewModel) {
                         Log.d("NavigationGaz", "Navigating to CaseResultScreen with weapon: $it")
@@ -137,10 +158,16 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val resultWeapon = it.arguments?.getParcelable<WeaponData>("resultWeapon")//вообще не так вроде надо, но работает
                     Log.d("NavigationGaz", "Received weapon in CaseResultScreen: $it")
-                    CaseResult(resultWeapon, weaponViewModel) {
-                        navController.navigate(AppScreen.MyInventoryScreen) // OnClick для перехода в инвентарь
-                    }
-
+                    CaseResult(
+                        centerItemIndex = resultWeapon,
+                        weaponViewModel = weaponViewModel,
+                        onClickGoMyInventory = {
+                            navController.navigate(AppScreen.MyInventoryScreen) // OnClick для перехода в инвентарь
+                        },
+                        onClickGoPreCase = {
+                            navController.navigate(AppScreen.PreCaseScreen)
+                        }
+                    )
                 }
 
                 composable<AppScreen.MyInventoryScreen> {
@@ -217,7 +244,7 @@ private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel
                                 .width(150.dp)
                                 .height(100.dp)
                                 .clickable {
-                                    navController.navigate(AppScreen.CaseOpeningScreen)
+                                    navController.navigate(AppScreen.PreCaseScreen)
                                 }
                                 .graphicsLayer(rotationZ = angle)
                         ) {

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import coil.Coil
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
+import com.example.mycases.data.Inventory
 import com.example.mycases.data.WeaponData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -167,6 +168,10 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (WeaponData) -> Unit)
         }?.index
 
         delay(300) // задержка
+        val weaponForInventory = Inventory(0, weaponList[43]!!.id)
+        withContext(Dispatchers.IO) {
+            weaponViewModel.insertWeaponToInventory(weaponForInventory)
+        }
         onClick(weaponList[43])
     }
 

@@ -15,4 +15,10 @@ sealed class AppScreen {
 
     @Serializable
     object MyInventoryScreen : AppScreen()
+
+    @Serializable
+    object PreCaseScreen : AppScreen()
+
+    @Serializable
+    object InsideTheCaseScreen : AppScreen()
 }
