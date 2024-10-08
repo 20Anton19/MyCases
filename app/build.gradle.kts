@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize")
     id("kotlin-kapt")
+    alias(libs.plugins.daggerHiltPlugin)
 }
 
 android {
@@ -102,4 +103,8 @@ dependencies {
     //Navigation
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+
+    //Hilt
+    implementation (libs.hilt.android)
+    kapt (libs.hilt.compiler)
 }
