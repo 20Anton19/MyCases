@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 sealed class AppScreen {
     @Serializable
-    object MainActivityScreen : AppScreen()
+    object MainMenuScreen : AppScreen()
 
     @Serializable
     object CaseOpeningScreen : AppScreen()

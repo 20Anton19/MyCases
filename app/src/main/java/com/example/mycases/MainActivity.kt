@@ -121,10 +121,17 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             NavHost(
                 navController = navController,
-                startDestination = AppScreen.MainActivityScreen
+                startDestination = AppScreen.MainMenuScreen
             ) {
-                composable<AppScreen.MainActivityScreen> {
-                    MyApp(navController)
+                composable<AppScreen.MainMenuScreen> {
+                    MainMenu (
+                        onClickGoPreCase = {
+                            navController.navigate(AppScreen.PreCaseScreen)
+                        },
+                        onClickGoMyInventory = {
+                            navController.navigate(AppScreen.MyInventoryScreen)
+                        }
+                    )
                 }
 
                 composable<AppScreen.PreCaseScreen> {
@@ -135,8 +142,8 @@ class MainActivity : ComponentActivity() {
                         onClickShowInside = {
                             navController.navigate(AppScreen.InsideTheCaseScreen)
                         },
-                        onClickGoMainActivity = {
-                            navController.navigate(AppScreen.MainActivityScreen)
+                        onClickGoMainMenu = {
+                            navController.navigate(AppScreen.MainMenuScreen)
                         }
                     )
                 }
@@ -173,172 +180,15 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable<AppScreen.MyInventoryScreen> {
-                    MyInventory() {
-
-                    }
+                    MyInventory(
+                        onClickGoMainMenu = {
+                            navController.navigate(AppScreen.MainMenuScreen)
+                        }
+                    )
                 }
             }
 
         }
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel = hiltViewModel()) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val angle by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 0f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 4000
-                0f at 0 using LinearEasing
-                8f at 1000 using LinearEasing
-                0f at 2000 using LinearEasing
-                -8f at 3000 using LinearEasing
-                0f at 4000 using LinearEasing
-            },
-            repeatMode = RepeatMode.Restart,
-        ), label = "поворот кейса"
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Green)
-    ){
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = "gaz") },
-                    modifier = Modifier
-                        .height(35.dp),
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
-                        containerColor = Color.Blue.copy(alpha = 0.35f)
-                    ),
-
-                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-                )
-                Text(text = "гз")
-            },
-            content = {
-                Image(
-                    painter = painterResource(id = R.drawable.bg_main_01),
-                    contentDescription = "mainbg",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(30.dp, 65.dp, 30.dp, 65.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxHeight(),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate(AppScreen.PreCaseScreen)
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate(AppScreen.CaseOpeningScreen)
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
-                    }
-                    Column(
-                        modifier = Modifier.fillMaxHeight(),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate(AppScreen.CaseOpeningScreen)
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate(AppScreen.MyInventoryScreen)
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
-                    }
-                }
-            },
-            bottomBar = {
-                BottomAppBar (
-                    modifier = Modifier
-                        .height(35.dp),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        text = "Bottom app bar",
-                    )
-                }
-            },
-            floatingActionButton = {
-                FloatingActionButton(onClick = {  }) {
-                    Icon(Icons.Default.Add, contentDescription = "Add")
-                }
-            }
-        )
     }
 }

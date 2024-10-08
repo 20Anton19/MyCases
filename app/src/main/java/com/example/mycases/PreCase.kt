@@ -22,7 +22,7 @@ fun PreCase(
     weaponViewModel: WeaponViewModel = hiltViewModel(),
     onClick: () -> Unit,
     onClickShowInside: () -> Unit,
-    onClickGoMainActivity: () -> Unit
+    onClickGoMainMenu: () -> Unit
 ) {
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -66,7 +66,7 @@ fun PreCase(
             .width(150.dp)
             .height(100.dp),
         onClick = {
-            onClickGoMainActivity()
+            onClickGoMainMenu()
         }
     ) {
         Text(

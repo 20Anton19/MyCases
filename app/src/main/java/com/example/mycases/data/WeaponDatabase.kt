@@ -8,7 +8,6 @@ import androidx.room.RoomDatabase
 @Database(entities = [WeaponData::class, Inventory::class], version = 1, exportSchema = false)
 abstract class WeaponDatabase : RoomDatabase() {
     abstract val weaponDao: WeaponDao
-
     /*
     companion object {
         @Volatile
