@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.Coil
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
@@ -140,7 +141,7 @@ private suspend fun preloadImages(context: Context, weaponList: List<WeaponData>
 }
 
 @Composable
-fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (WeaponData) -> Unit) {
+fun CaseOpening(weaponViewModel: WeaponViewModel = hiltViewModel(), onClick: (WeaponData) -> Unit) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current

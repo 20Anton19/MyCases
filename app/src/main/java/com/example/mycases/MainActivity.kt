@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -68,11 +69,13 @@ import com.example.mycases.data.WeaponData
 import com.example.mycases.data.WeaponDatabase
 import com.example.mycases.ui.theme.Roulette
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.reflect.typeOf
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +99,7 @@ class MainActivity : ComponentActivity() {
         }
         ///////////////////////////////////////////////////////////////////////////////
 
-
+        /*
         val database = WeaponDatabase.getDatabase(this)
         val weaponDao = database.weaponDao()
 
@@ -111,6 +114,7 @@ class MainActivity : ComponentActivity() {
         weaponDao.getAllWeapons().observe(this, Observer { WeaponList ->
             Log.d("WeaponViewModel", "Список оружий: $WeaponList")
         })
+        */
 
 
         setContent {
@@ -120,12 +124,11 @@ class MainActivity : ComponentActivity() {
                 startDestination = AppScreen.MainActivityScreen
             ) {
                 composable<AppScreen.MainActivityScreen> {
-                    MyApp(navController, weaponViewModel)
+                    MyApp(navController)
                 }
 
                 composable<AppScreen.PreCaseScreen> {
                     PreCase(
-                        weaponViewModel = weaponViewModel,
                         onClick = {
                             navController.navigate(AppScreen.CaseOpeningScreen)
                         },
@@ -139,13 +142,13 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable<AppScreen.InsideTheCaseScreen> {
-                    InsideTheCase(weaponViewModel){
+                    InsideTheCase(){
 
                     }
                 }
 
                 composable<AppScreen.CaseOpeningScreen> {
-                    CaseOpening(weaponViewModel) {
+                    CaseOpening() {
                         Log.d("NavigationGaz", "Navigating to CaseResultScreen with weapon: $it")
                         navController.navigate(AppScreen.CaseResultScreen(resultWeapon = it))
                     }
@@ -160,7 +163,6 @@ class MainActivity : ComponentActivity() {
                     Log.d("NavigationGaz", "Received weapon in CaseResultScreen: $it")
                     CaseResult(
                         centerItemIndex = resultWeapon,
-                        weaponViewModel = weaponViewModel,
                         onClickGoMyInventory = {
                             navController.navigate(AppScreen.MyInventoryScreen) // OnClick для перехода в инвентарь
                         },
@@ -171,7 +173,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable<AppScreen.MyInventoryScreen> {
-                    MyInventory(weaponViewModel) {
+                    MyInventory() {
 
                     }
                 }
@@ -185,7 +187,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel) {
+private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel = hiltViewModel()) {
     val infiniteTransition = rememberInfiniteTransition()
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,

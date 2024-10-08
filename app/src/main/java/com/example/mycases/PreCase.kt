@@ -15,10 +15,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun PreCase(
-    weaponViewModel: WeaponViewModel,
+    weaponViewModel: WeaponViewModel = hiltViewModel(),
     onClick: () -> Unit,
     onClickShowInside: () -> Unit,
     onClickGoMainActivity: () -> Unit

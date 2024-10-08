@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mycases.data.Inventory
 import com.example.mycases.data.WeaponData
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun CaseResult(
     centerItemIndex: WeaponData?,
-    weaponViewModel: WeaponViewModel,
+    weaponViewModel: WeaponViewModel = hiltViewModel(),
     onClickGoMyInventory: () -> Unit,
     onClickGoPreCase: () -> Unit
 ) {
