@@ -80,6 +80,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         /////////////////////УБИРАЕМ ЧЕРНЫЕ ПОЛОСЫ ПО БОКАМ И СВЕРХУ////////////////////////
         // Настройка для полноэкранного отображения
         WindowCompat.setDecorFitsSystemWindows(window, false)

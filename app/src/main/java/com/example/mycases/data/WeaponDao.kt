@@ -3,6 +3,7 @@ package com.example.mycases.data
 import androidx.core.location.LocationRequestCompat.Quality
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WeaponDao {
@@ -24,6 +25,9 @@ interface WeaponDao {
 
     @Query("SELECT * FROM inventory")
     fun getAllInventory(): LiveData<List<Inventory>>
+
+    @Query("SELECT * FROM inventory")
+    fun getAllInventoryFlow(): Flow<List<Inventory>>
 
     @Query("SELECT * FROM inventory ORDER BY dateAdded DESC")
     fun getAllInventorySortedByDate(): LiveData<List<Inventory>>

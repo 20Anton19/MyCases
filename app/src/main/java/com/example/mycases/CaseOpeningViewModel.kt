@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModel
 import coil.Coil
 import coil.request.ImageRequest
 import com.example.mycases.data.WeaponData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+@HiltViewModel
 class CaseOpeningViewModel @Inject constructor() : ViewModel() {
     private fun randomRarity(): String {
         val choice = (0..9999).random()
@@ -89,7 +91,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    suspend fun getWeaponListOfDandoms(weaponViewModel: WeaponViewModel): List<WeaponData> {
+    suspend fun getWeaponListOfRandoms(weaponViewModel: WeaponViewModel): List<WeaponData> {
         val weaponList: MutableList<WeaponData> = mutableListOf()
         repeat(47) {
             // Получение оружия в асинхронной корутине

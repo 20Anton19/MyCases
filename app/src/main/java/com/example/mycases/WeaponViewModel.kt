@@ -1,6 +1,7 @@
 package com.example.mycases
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.core.location.LocationRequestCompat.Quality
 import androidx.lifecycle.*
 import com.example.mycases.data.Inventory
@@ -8,7 +9,12 @@ import com.example.mycases.data.WeaponDao
 import com.example.mycases.data.WeaponData
 import com.example.mycases.data.WeaponDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,9 +23,29 @@ class WeaponViewModel @Inject constructor(
     val weaponDatabase: WeaponDatabase
 ) : ViewModel() {
 
+    private val _weaponListWithDate = MutableStateFlow<List<Pair<WeaponData, Long>>>(emptyList())
+    val weaponListWithDate: StateFlow<List<Pair<WeaponData, Long>>> = _weaponListWithDate.asStateFlow()
+
     private val inventory: LiveData<List<Inventory>> = weaponDatabase.weaponDao.getAllInventory()
 
     private val weaponList: LiveData<List<WeaponData>> = weaponDatabase.weaponDao.getAllWeapons()
+
+
+
+    init {
+        Log.d("Ebaso", "Я перезапустился")
+        viewModelScope.launch {
+            weaponDatabase.weaponDao.getAllInventoryFlow().collect { inventoryList ->
+                val pairs = inventoryList.map { inventoryItem ->
+                    val weapon = withContext(Dispatchers.IO) {
+                        weaponDatabase.weaponDao.getWeaponById(inventoryItem.weaponId)
+                    }
+                    Pair(weapon, inventoryItem.dateAdded)
+                }
+                _weaponListWithDate.value = pairs
+            }
+        }
+    }
 
     /*
     fun addRandomWeapon() {

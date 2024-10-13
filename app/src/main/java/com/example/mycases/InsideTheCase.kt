@@ -8,7 +8,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mycases.data.WeaponData
 
 @Composable
-fun InsideTheCase(weaponViewModel: WeaponViewModel = hiltViewModel(), onClick: () -> Unit) {
+fun InsideTheCase(
+    weaponViewModel: WeaponViewModel = hiltViewModel(),
+    onClick: () -> Unit
+) {
     val weaponList = remember { mutableStateListOf<WeaponData>() }
     LaunchedEffect(Unit) {
 

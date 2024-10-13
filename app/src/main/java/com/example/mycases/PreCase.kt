@@ -1,5 +1,6 @@
 package com.example.mycases
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun PreCase(
-    weaponViewModel: WeaponViewModel = hiltViewModel(),
+    weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onClick: () -> Unit,
     onClickShowInside: () -> Unit,
     onClickGoMainMenu: () -> Unit

@@ -1,6 +1,7 @@
 package com.example.mycases
 
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -43,7 +44,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun CaseResult(
     centerItemIndex: WeaponData?,
-    weaponViewModel: WeaponViewModel = hiltViewModel(),
+    weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onClickGoMyInventory: () -> Unit,
     onClickGoPreCase: () -> Unit
 ) {

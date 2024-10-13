@@ -3,6 +3,7 @@ package com.example.mycases
 import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,8 +51,9 @@ import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun CaseOpening(
-    weaponViewModel: WeaponViewModel = hiltViewModel(),
+    weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(),
+
     onClick: (WeaponData) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -92,7 +94,7 @@ fun CaseOpening(
         //ddfffdfddfdffd
     LaunchedEffect(Unit) {
         weaponList.clear()
-        weaponList.addAll(caseOpeningViewModel.getWeaponListOfDandoms(weaponViewModel))
+        weaponList.addAll(caseOpeningViewModel.getWeaponListOfRandoms(weaponViewModel))
         preloadedImages = withContext(Dispatchers.IO) {
             //preloadImages(context, weaponList)
             caseOpeningViewModel.preloadImages(context, weaponList)
