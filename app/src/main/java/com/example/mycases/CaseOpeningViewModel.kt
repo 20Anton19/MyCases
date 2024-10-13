@@ -70,7 +70,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         return quality
     }
 
-    suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
+    private suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
         return suspendCoroutine { continuation ->
             val weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",10.0, true)
             val rarity = randomRarity()
@@ -91,17 +91,29 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private val  weaponList: MutableList<WeaponData> = mutableListOf()
+    private val weaponList: MutableList<WeaponData> = mutableListOf()
+    private val preloadedImages: MutableList<Int> = mutableListOf()
+
 
     fun getWeaponListOfRandoms(): List<WeaponData> {
         return weaponList
+    }
+
+    fun preloadImages(): List<Int> {
+        return preloadedImages
     }
 
     init {
         Log.d("EbasoEbaso", "Я создался")
     }
 
-    suspend fun createWeaponListOfRandoms(weaponViewModel: WeaponViewModel) {
+    suspend fun makeAllWork(weaponViewModel: WeaponViewModel, context: Context)
+    {
+        createWeaponListOfRandoms(weaponViewModel)
+        createPreloadImages(context)
+    }
+
+    private suspend fun createWeaponListOfRandoms(weaponViewModel: WeaponViewModel) {
         weaponList.clear()
         repeat(47) {
             // Получение оружия в асинхронной корутине
@@ -114,8 +126,9 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         Log.d("EbasoEbaso", "Я прогрузил список $weaponList")
     }
 
-    fun preloadImages(context: Context, weaponList: List<WeaponData>): List<Int> {
-        val preloadedImages = weaponList.map { weapon ->
+    private fun createPreloadImages(context: Context) {
+        preloadedImages.clear()
+        val prePreloadedImages = weaponList.map { weapon ->
             val resourceId = ResourceGenerator.getResourceId(context, weapon.name, weapon.skin)
             if (resourceId != 0) {
                 // Предзагрузка с помощью Coil
@@ -127,6 +140,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
             }
             resourceId
         }
-        return preloadedImages
+        preloadedImages.addAll(prePreloadedImages)
+        Log.d("EbasoEbaso", "Я прогрузил изображения")
     }
 }

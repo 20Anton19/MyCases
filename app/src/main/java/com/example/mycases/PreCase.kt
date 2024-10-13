@@ -1,5 +1,6 @@
 package com.example.mycases
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,8 +33,15 @@ fun PreCase(
     onClickShowInside: () -> Unit,
     onClickGoMainMenu: () -> Unit
 ) {
+    val context = LocalContext.current
+    var isLoading by remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
-        caseOpeningViewModel.createWeaponListOfRandoms(weaponViewModel)
+        if (caseOpeningViewModel.preloadImages().isEmpty()) {
+            Log.d("EbasoEbaso", "Ты гандон")
+            caseOpeningViewModel.makeAllWork(weaponViewModel, context)
+        }
+        isLoading = false
     }
 
     Column (
@@ -37,20 +49,38 @@ fun PreCase(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Button(
-            modifier = Modifier
-                .width(400.dp)
-                .height(150.dp),
-            onClick = {
-                onClick()
+        if (isLoading) {
+            Button(
+                modifier = Modifier
+                    .width(400.dp)
+                    .height(150.dp),
+                onClick = {
+                }
+            ) {
+                Text(
+                    text = "Открыть",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 50.sp,
+                    color = Color.Gray
+                )
             }
-        ) {
-            Text(
-                text = "Открыть",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 50.sp,
-                color = Color.White
-            )
+        }
+        else {
+            Button(
+                modifier = Modifier
+                    .width(400.dp)
+                    .height(150.dp),
+                onClick = {
+                    onClick()
+                }
+            ) {
+                Text(
+                    text = "Открыть",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 50.sp,
+                    color = Color.White
+                )
+            }
         }
 
         Button(

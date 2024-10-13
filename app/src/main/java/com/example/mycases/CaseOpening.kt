@@ -82,7 +82,8 @@ fun CaseOpening(
             Math.abs(it.offset + it.size / 2 - center)
         }?.index
 
-        delay(300) // задержка
+        caseOpeningViewModel.makeAllWork(weaponViewModel, context)
+        delay(50) // задержка
         val weaponForInventory = Inventory(0, weaponList[43]!!.id)
         withContext(Dispatchers.IO) {
             weaponViewModel.insertWeaponToInventory(weaponForInventory)
@@ -97,7 +98,7 @@ fun CaseOpening(
         weaponList.addAll(caseOpeningViewModel.getWeaponListOfRandoms())
         preloadedImages = withContext(Dispatchers.IO) {
             //preloadImages(context, weaponList)
-            caseOpeningViewModel.preloadImages(context, weaponList)
+            caseOpeningViewModel.preloadImages()
         }
         isLoading = false  // Завершаем загрузку
     }
