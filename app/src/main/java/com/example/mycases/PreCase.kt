@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,10 +23,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun PreCase(
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onClick: () -> Unit,
     onClickShowInside: () -> Unit,
     onClickGoMainMenu: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        caseOpeningViewModel.createWeaponListOfRandoms(weaponViewModel)
+    }
+
     Column (
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

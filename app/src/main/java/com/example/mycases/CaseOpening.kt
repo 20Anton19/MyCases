@@ -52,7 +52,7 @@ import kotlin.coroutines.suspendCoroutine
 @Composable
 fun CaseOpening(
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
-    caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(),
+    caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
 
     onClick: (WeaponData) -> Unit
 ) {
@@ -94,7 +94,7 @@ fun CaseOpening(
         //ddfffdfddfdffd
     LaunchedEffect(Unit) {
         weaponList.clear()
-        weaponList.addAll(caseOpeningViewModel.getWeaponListOfRandoms(weaponViewModel))
+        weaponList.addAll(caseOpeningViewModel.getWeaponListOfRandoms())
         preloadedImages = withContext(Dispatchers.IO) {
             //preloadImages(context, weaponList)
             caseOpeningViewModel.preloadImages(context, weaponList)

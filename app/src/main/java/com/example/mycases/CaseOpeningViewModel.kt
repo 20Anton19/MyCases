@@ -91,8 +91,18 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    suspend fun getWeaponListOfRandoms(weaponViewModel: WeaponViewModel): List<WeaponData> {
-        val weaponList: MutableList<WeaponData> = mutableListOf()
+    private val  weaponList: MutableList<WeaponData> = mutableListOf()
+
+    fun getWeaponListOfRandoms(): List<WeaponData> {
+        return weaponList
+    }
+
+    init {
+        Log.d("EbasoEbaso", "Я создался")
+    }
+
+    suspend fun createWeaponListOfRandoms(weaponViewModel: WeaponViewModel) {
+        weaponList.clear()
         repeat(47) {
             // Получение оружия в асинхронной корутине
             val weapon = withContext(Dispatchers.IO) {
@@ -101,10 +111,10 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
             }
             weaponList.add(weapon)  // Добавляем новое оружие в список
         }
-        return weaponList
+        Log.d("EbasoEbaso", "Я прогрузил список $weaponList")
     }
 
-    suspend fun preloadImages(context: Context, weaponList: List<WeaponData>): List<Int> {
+    fun preloadImages(context: Context, weaponList: List<WeaponData>): List<Int> {
         val preloadedImages = weaponList.map { weapon ->
             val resourceId = ResourceGenerator.getResourceId(context, weapon.name, weapon.skin)
             if (resourceId != 0) {
