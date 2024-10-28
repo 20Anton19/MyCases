@@ -24,6 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun PreCase(
@@ -35,6 +39,7 @@ fun PreCase(
 ) {
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(true) }
+    var isButtonEnabled by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         if (caseOpeningViewModel.preloadImages().isEmpty()) {
@@ -71,8 +76,17 @@ fun PreCase(
                     .width(400.dp)
                     .height(150.dp),
                 onClick = {
-                    onClick()
-                }
+                    if (isButtonEnabled) {
+                        isButtonEnabled = false
+                        // Запускаем долгую операцию
+                        CoroutineScope(Dispatchers.Main).launch {
+                            onClick()
+                            delay(100)
+                            isButtonEnabled = true
+                        }
+                    }
+                },
+                enabled = isButtonEnabled
             ) {
                 Text(
                     text = "Открыть",
