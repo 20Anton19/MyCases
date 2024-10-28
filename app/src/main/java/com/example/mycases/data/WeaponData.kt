@@ -20,6 +20,7 @@ data class WeaponData(
     val rarity: String,
     val quality: String,
     val qualityRu: String,
+    val positionInCase: Int,
     val price: Double,
     val statTrack: Boolean
 ): Parcelable

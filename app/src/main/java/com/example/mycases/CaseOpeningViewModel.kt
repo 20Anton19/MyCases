@@ -72,7 +72,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
 
     private suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
         return suspendCoroutine { continuation ->
-            val weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",10.0, true)
+            val weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",1,10.0, true)
             val rarity = randomRarity()
             val quality = randomQuality()
 

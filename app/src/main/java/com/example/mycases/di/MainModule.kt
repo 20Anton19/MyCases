@@ -20,7 +20,8 @@ object MainModule {
             WeaponDatabase::class.java,
             "weapon_database"
         )
-        .createFromAsset("wb5.db")
+
+        .createFromAsset("wb6.db")
         .build()
     }
 }

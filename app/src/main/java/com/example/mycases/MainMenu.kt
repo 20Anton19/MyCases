@@ -49,7 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainMenu(
-    weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    //weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onClickGoPreCase: () -> Unit,
     onClickGoMyInventory: () -> Unit
 ) {
