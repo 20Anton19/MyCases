@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 fun PreCase(
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onClick: () -> Unit,
     onClickShowInside: () -> Unit,
     onClickGoMainMenu: () -> Unit

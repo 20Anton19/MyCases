@@ -56,6 +56,19 @@ class WeaponViewModel @Inject constructor(
         }
     }
     */
+
+    fun getWhatInTheCase(caseName: String, onResult: (List<WeaponData>?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val weaponList = weaponDatabase.weaponDao.getWeaponsInsideTheCase(caseName)
+                onResult(weaponList)
+            } catch (e: Exception) {
+                Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")
+                onResult(null)
+            }
+        }
+    }
+
     fun getRandomWeaponVM(rarity: String, quality: String, onResult: (WeaponData?) -> Unit) {
         viewModelScope.launch {
             try {

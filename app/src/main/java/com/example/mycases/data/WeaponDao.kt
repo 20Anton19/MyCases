@@ -42,6 +42,10 @@ interface WeaponDao {
     @Query("SELECT * FROM weapon_table WHERE rarity = :rarityParam AND quality = :qualityParam ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomWeapon(rarityParam: String, qualityParam: String): WeaponData
 
+    //
+    @Query("SELECT * FROM weapon_table WHERE weaponCase = :caseName AND quality = 'Factory New' ORDER BY positionInCase")
+    suspend fun getWeaponsInsideTheCase(caseName: String): List<WeaponData>
+
     /*
         @Query("DELETE FROM weapon_table")
         suspend fun clearWeaponData()
