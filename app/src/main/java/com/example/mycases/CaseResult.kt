@@ -46,7 +46,7 @@ fun CaseResult(
     centerItemIndex: WeaponData?,
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onClickGoMyInventory: () -> Unit,
-    onClickGoPreCase: () -> Unit
+    onClickGoPreCase: (String) -> Unit
 ) {
     val brush =  Brush.horizontalGradient(
         listOf(Color.Red, Color.Green, Color.Blue),
@@ -159,7 +159,7 @@ fun CaseResult(
             .width(150.dp)
             .height(100.dp),
         onClick = {
-            onClickGoPreCase()
+            onClickGoPreCase(centerItemIndex!!.weaponCase)
         }
     ) {
         Text(

@@ -69,10 +69,10 @@ class WeaponViewModel @Inject constructor(
         }
     }
 
-    fun getRandomWeaponVM(rarity: String, quality: String, onResult: (WeaponData?) -> Unit) {
+    fun getRandomWeaponVM(caseName: String, rarity: String, quality: String, onResult: (WeaponData?) -> Unit) {
         viewModelScope.launch {
             try {
-                val randomWeapon = weaponDatabase.weaponDao.getRandomWeapon(rarity, quality)
+                val randomWeapon = weaponDatabase.weaponDao.getRandomWeapon(caseName, rarity, quality)
                 onResult(randomWeapon)
             } catch (e: Exception) {
                 Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")

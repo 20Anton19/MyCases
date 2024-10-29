@@ -70,7 +70,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         return quality
     }
 
-    private suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
+    private suspend fun randomWeapon(caseName: String, weaponViewModel: WeaponViewModel): WeaponData {
         return suspendCoroutine { continuation ->
             val weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",1,10.0, true)
             val rarity = randomRarity()
@@ -79,7 +79,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
             //val rarity = "Covert"
             //val quality = "Battle-Scarred"
 
-            weaponViewModel.getRandomWeaponVM(rarity, quality) { randWeapon ->
+            weaponViewModel.getRandomWeaponVM(caseName, rarity, quality) { randWeapon ->
                 if (randWeapon == null) {
                     Log.d("WeaponFragment", "Такого оружия не нашлось + $rarity + $quality")
                     continuation.resume(weapon)
@@ -93,7 +93,19 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
 
     private val weaponList: MutableList<WeaponData> = mutableListOf()
     private val preloadedImages: MutableList<Int> = mutableListOf()
+    private lateinit var caseName: String
 
+    fun setCaseName(caseName: String) {
+        this.caseName = caseName
+    }
+
+    fun getCaseName(): String? {
+        return if (::caseName.isInitialized) {
+            caseName
+        } else {
+            null
+        }
+    }
 
     fun getWeaponListOfRandoms(): List<WeaponData> {
         return weaponList
@@ -107,6 +119,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         Log.d("EbasoEbaso", "Я создался")
     }
 
+
     suspend fun makeAllWork(weaponViewModel: WeaponViewModel, context: Context)
     {
         createWeaponListOfRandoms(weaponViewModel)
@@ -119,7 +132,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
             // Получение оружия в асинхронной корутине
             val weapon = withContext(Dispatchers.IO) {
                 //randomWeapon(weaponViewModel)  // Асинхронный вызов
-                randomWeapon(weaponViewModel)
+                randomWeapon(caseName, weaponViewModel)
             }
             weaponList.add(weapon)  // Добавляем новое оружие в список
         }

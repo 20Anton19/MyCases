@@ -127,7 +127,7 @@ class MainActivity : ComponentActivity() {
                 composable<AppScreen.MainMenuScreen> {
                     MainMenu (
                         onClickGoPreCase = {
-                            navController.navigate(AppScreen.PreCaseScreen)
+                            navController.navigate(AppScreen.PreCaseScreen(caseName = it))
                         },
                         onClickGoMyInventory = {
                             navController.navigate(AppScreen.MyInventoryScreen)
@@ -136,7 +136,9 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable<AppScreen.PreCaseScreen> {
+                    val args = it.toRoute<AppScreen.PreCaseScreen>()
                     PreCase(
+                        caseName = args.caseName,
                         onClick = {
                             navController.navigate(AppScreen.CaseOpeningScreen)
                         },
@@ -175,7 +177,7 @@ class MainActivity : ComponentActivity() {
                             navController.navigate(AppScreen.MyInventoryScreen) // OnClick для перехода в инвентарь
                         },
                         onClickGoPreCase = {
-                            navController.navigate(AppScreen.PreCaseScreen)
+                            navController.navigate(AppScreen.PreCaseScreen(caseName = it))
                         }
                     )
                 }

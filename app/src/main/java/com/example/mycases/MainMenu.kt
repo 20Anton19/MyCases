@@ -21,9 +21,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -35,6 +38,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -50,7 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun MainMenu(
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
-    onClickGoPreCase: () -> Unit,
+    onClickGoPreCase: (String) -> Unit,
     onClickGoMyInventory: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition()
@@ -70,6 +76,28 @@ fun MainMenu(
         ), label = "поворот кейса"
     )
 
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        LazyRow {
+            items(caseList.take(if (expanded) caseList.size else 2)) { item ->
+                CaseCard(
+                    onClick = { onClickGoPreCase(item) },
+                    angle = angle,
+                    imageResId = R.drawable.kalash,
+                    contentDescription = "case1"
+                )
+            }
+        }
+
+        Button(
+            onClick = { expanded = !expanded },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(if (expanded) "Скрыть" else "Показать все")
+        }
+    }
+/*
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -106,81 +134,35 @@ fun MainMenu(
                         modifier = Modifier.fillMaxHeight(),
                         verticalArrangement = Arrangement.SpaceBetween
                     ){
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    onClickGoPreCase()
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    onClickGoPreCase()
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
+                        CaseCard(
+                            onClick = { onClickGoPreCase() },
+                            angle = angle,
+                            imageResId = R.drawable.kalash,
+                            contentDescription = "case1"
+                        )
+                        CaseCard(
+                            onClick = { onClickGoPreCase() },
+                            angle = angle,
+                            imageResId = R.drawable.kalash,
+                            contentDescription = "case1"
+                        )
                     }
                     Column(
                         modifier = Modifier.fillMaxHeight(),
                         verticalArrangement = Arrangement.SpaceBetween
                     ){
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    onClickGoPreCase()
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    onClickGoMyInventory()
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
+                        CaseCard(
+                            onClick = { onClickGoPreCase() },
+                            angle = angle,
+                            imageResId = R.drawable.kalash,
+                            contentDescription = "case1"
+                        )
+                        CaseCard(
+                            onClick = { onClickGoMyInventory() },
+                            angle = angle,
+                            imageResId = R.drawable.kalash,
+                            contentDescription = "case1"
+                        )
                     }
                 }
             },
@@ -206,4 +188,39 @@ fun MainMenu(
             }
         )
     }
+    */
+
 }
+
+@Composable
+fun CaseCard(
+    onClick: () -> Unit,
+    angle: Float,
+    imageResId: Int,
+    contentDescription: String
+) {
+    Card(
+        modifier = Modifier
+            .width(150.dp)
+            .height(100.dp)
+            .clickable { onClick() }
+            .graphicsLayer(rotationZ = angle)
+    ) {
+        Image(
+            painter = painterResource(id = imageResId),
+            contentDescription = contentDescription,
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+private val caseList = listOf(
+    "Kilowatt",
+    "Revolution",
+    "Future",
+    "Bugul",
+    "Obsha",
+    "Misha"
+)

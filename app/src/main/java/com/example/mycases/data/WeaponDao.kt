@@ -39,8 +39,8 @@ interface WeaponDao {
 
     //Получаем рандомно разные качества
 
-    @Query("SELECT * FROM weapon_table WHERE rarity = :rarityParam AND quality = :qualityParam ORDER BY RANDOM() LIMIT 1")
-    suspend fun getRandomWeapon(rarityParam: String, qualityParam: String): WeaponData
+    @Query("SELECT * FROM weapon_table WHERE weaponCase = :caseNameParam AND rarity = :rarityParam AND quality = :qualityParam ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomWeapon(caseNameParam: String, rarityParam: String, qualityParam: String): WeaponData
 
     //
     @Query("SELECT * FROM weapon_table WHERE weaponCase = :caseName AND quality = 'Factory New' ORDER BY positionInCase")

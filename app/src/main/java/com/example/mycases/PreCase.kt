@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun PreCase(
+    caseName: String,
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
@@ -43,8 +44,9 @@ fun PreCase(
     var isButtonEnabled by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        if (caseOpeningViewModel.preloadImages().isEmpty()) {
+        if ((caseOpeningViewModel.preloadImages().isEmpty()) or (caseOpeningViewModel.getCaseName() != caseName)) {
             Log.d("EbasoEbaso", "Ты гандон")
+            caseOpeningViewModel.setCaseName(caseName)
             caseOpeningViewModel.makeAllWork(weaponViewModel, context)
         }
         isLoading = false
@@ -64,7 +66,7 @@ fun PreCase(
                 }
             ) {
                 Text(
-                    text = "Открыть",
+                    text = caseName,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 50.sp,
                     color = Color.Gray
@@ -90,7 +92,7 @@ fun PreCase(
                 enabled = isButtonEnabled
             ) {
                 Text(
-                    text = "Открыть",
+                    text = caseName,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 50.sp,
                     color = Color.White
