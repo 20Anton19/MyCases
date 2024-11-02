@@ -9,6 +9,10 @@ class ResourceGenerator() {
             val imgName = sanitizeString(name + "__" + skin)
             return context.resources.getIdentifier(imgName, "drawable", context.packageName)
         }
+        fun getResourceId(context: Context): Int {
+            val imgName = "knife"
+            return context.resources.getIdentifier(imgName, "drawable", context.packageName)
+        }
         private fun sanitizeString(input: String): String {
             var imgName = input
             // Проверяем, содержит ли строка символ '-'

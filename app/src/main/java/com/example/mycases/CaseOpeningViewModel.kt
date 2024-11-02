@@ -21,7 +21,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
         val rarity: String
         when (choice) {
             in 0..25 -> {
-                rarity = "Contraband"
+                rarity = "Contraband"  //имеется ввиду нож, так как ничего кроме ножа контробандой быть не может в кейсах, а сами ножи могут и тайными быть
             }
             in 26..89 -> {
                 rarity = "Covert"
@@ -142,7 +142,13 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
     private fun createPreloadImages(context: Context) {
         preloadedImages.clear()
         val prePreloadedImages = weaponList.map { weapon ->
-            val resourceId = ResourceGenerator.getResourceId(context, weapon.name, weapon.skin)
+            val resourceId: Int
+            if (weapon.rarity == "Contraband") {
+                resourceId = ResourceGenerator.getResourceId(context)
+            }
+            else {
+                resourceId = ResourceGenerator.getResourceId(context, weapon.name, weapon.skin)
+            }
             if (resourceId != 0) {
                 // Предзагрузка с помощью Coil
                 ImageRequest.Builder(context)
