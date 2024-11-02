@@ -20,5 +20,5 @@ sealed class AppScreen {
     class PreCaseScreen(val caseName: String) : AppScreen()
 
     @Serializable
-    object InsideTheCaseScreen : AppScreen()
+    class InsideTheCaseScreen(val caseName: String)  : AppScreen()
 }

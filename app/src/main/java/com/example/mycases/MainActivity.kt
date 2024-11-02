@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
                             navController.navigate(AppScreen.CaseOpeningScreen)
                         },
                         onClickShowInside = {
-                            navController.navigate(AppScreen.InsideTheCaseScreen)
+                            navController.navigate(AppScreen.InsideTheCaseScreen(caseName = args.caseName))
                         },
                         onClickGoMainMenu = {
                             navController.navigate(AppScreen.MainMenuScreen)
@@ -152,9 +152,10 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable<AppScreen.InsideTheCaseScreen> {
-                    InsideTheCase(){
-
-                    }
+                    val args = it.toRoute<AppScreen.PreCaseScreen>()
+                    InsideTheCase(
+                        caseName = args.caseName
+                    )
                 }
 
                 composable<AppScreen.CaseOpeningScreen> {

@@ -14,13 +14,47 @@ import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class InsideTheCaseViewModel @Inject constructor() : ViewModel() {
-    suspend fun getWhatIsInside(weaponViewModel: WeaponViewModel): List<WeaponData>{
-        return getList(weaponViewModel)
+    suspend fun makeAllWork(weaponViewModel: WeaponViewModel){
+        val tempList = getList(weaponViewModel)
+        weaponListWithoutKnifes.clear()
+        listWithKnifes.clear()
+        weaponListWithoutKnifes.addAll(tempList.filterNot { it.rarity == "Contraband" })
+        listWithKnifes.addAll(tempList.filter { it.rarity == "Contraband" })
+    }
+
+    init {
+        Log.d("GasInside", "Я создался")
+    }
+
+
+    private lateinit var caseName: String
+
+    fun setCaseName(caseName: String) {
+        this.caseName = caseName
+    }
+
+    fun getCaseName(): String? {
+        return if (::caseName.isInitialized) {
+            caseName
+        } else {
+            null
+        }
+    }
+
+    private val weaponListWithoutKnifes: MutableList<WeaponData> = mutableListOf()
+    private val listWithKnifes: MutableList<WeaponData> = mutableListOf()
+
+    fun getWeaponListWithoutKnifes(): List<WeaponData> {
+        return weaponListWithoutKnifes
+    }
+
+    fun getListWithKnifes(): List<WeaponData> {
+        return listWithKnifes
     }
 
     private suspend fun getList(weaponViewModel: WeaponViewModel): List<WeaponData> {
         return suspendCoroutine { continuation ->
-            weaponViewModel.getWhatInTheCase("Kilowatt") { myList ->
+            weaponViewModel.getWhatInTheCase(caseName) { myList ->
                 if (myList == null) {
                     Log.d("WeaponFragment", "Такого оружия не нашлось")
                     continuation.resumeWithException(Exception("Оружие не найдено"))

@@ -34,9 +34,8 @@ fun PreCase(
     caseName: String,
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
-    insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onClick: () -> Unit,
-    onClickShowInside: () -> Unit,
+    onClickShowInside: (String) -> Unit,
     onClickGoMainMenu: () -> Unit
 ) {
     val context = LocalContext.current
@@ -105,7 +104,7 @@ fun PreCase(
                 .width(300.dp)
                 .height(100.dp),
             onClick = {
-                onClickShowInside()
+                onClickShowInside(caseName)
             }
         ) {
             Text(

@@ -1,5 +1,6 @@
 package com.example.mycases
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,9 +30,10 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun InsideTheCase(
+    caseName: String,
     weaponViewModel: WeaponViewModel = hiltViewModel(),
-    insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(),
-    onClick: () -> Unit
+    insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    //onClick: () -> Unit
 ) {
     val context = LocalContext.current
     var rowsAmount by remember { mutableStateOf(0) }
@@ -42,8 +44,11 @@ fun InsideTheCase(
     val weaponList: MutableList<WeaponData> = mutableListOf()
     LaunchedEffect(Unit) {
         weaponList.clear()
-        val tempList = withContext(Dispatchers.IO) {
-            insideTheCaseViewModel.getWhatIsInside(weaponViewModel)
+        var tempList = insideTheCaseViewModel.getWeaponListWithoutKnifes()
+        if ((tempList.isEmpty()) or (insideTheCaseViewModel.getCaseName() != caseName)) {
+            insideTheCaseViewModel.setCaseName(caseName)
+            insideTheCaseViewModel.makeAllWork(weaponViewModel)
+            tempList = insideTheCaseViewModel.getWeaponListWithoutKnifes()
         }
         weaponList.addAll(tempList)
         rowsAmount = kotlin.math.floor(weaponList.size / 4.0).toInt()
