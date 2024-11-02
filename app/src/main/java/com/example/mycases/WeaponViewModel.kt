@@ -33,7 +33,7 @@ class WeaponViewModel @Inject constructor(
 
 
     init {
-        Log.d("Ebaso", "Я перезапустился")
+        Log.d("Ebasooo", "Я перезапустился")
         viewModelScope.launch {
             weaponDatabase.weaponDao.getAllInventoryFlow().collect { inventoryList ->
                 val pairs = inventoryList.map { inventoryItem ->

@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun InsideTheCase(
     caseName: String,
-    weaponViewModel: WeaponViewModel = hiltViewModel(),
+    weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     //onClick: () -> Unit
 ) {
