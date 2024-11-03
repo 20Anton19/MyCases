@@ -154,6 +154,16 @@ class MainActivity : ComponentActivity() {
                 composable<AppScreen.InsideTheCaseScreen> {
                     val args = it.toRoute<AppScreen.PreCaseScreen>()
                     InsideTheCase(
+                        caseName = args.caseName,
+                        onClickGoKnifes = {
+                            navController.navigate(AppScreen.InsideTheCaseKnifesScreen(caseName = args.caseName))
+                        }
+                    )
+                }
+
+                composable<AppScreen.InsideTheCaseKnifesScreen> {
+                    val args = it.toRoute<AppScreen.InsideTheCaseScreen>()
+                    InsideTheCaseKnifes(
                         caseName = args.caseName
                     )
                 }

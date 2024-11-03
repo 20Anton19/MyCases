@@ -1,8 +1,8 @@
 package com.example.mycases
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,16 +25,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mycases.data.WeaponData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
-fun InsideTheCase(
+fun InsideTheCaseKnifes(
     caseName: String,
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
-    onClickGoKnifes: (String) -> Unit
 ) {
+    //Log.d("Ebasooos", "Я тут")
     val context = LocalContext.current
     var rowsAmount by remember { mutableStateOf(0) }
     var lastRowLen by remember { mutableStateOf(0) }
@@ -45,15 +42,15 @@ fun InsideTheCase(
     val weaponList: MutableList<WeaponData> = mutableListOf()
     LaunchedEffect(Unit) {
         weaponList.clear()
-        var tempList = insideTheCaseViewModel.getWeaponListWithoutKnifes()
+        var tempList = insideTheCaseViewModel.getListWithKnifes()
         if ((tempList.isEmpty()) or (insideTheCaseViewModel.getCaseName() != caseName)) {
             insideTheCaseViewModel.setCaseName(caseName)
             insideTheCaseViewModel.makeAllWork(weaponViewModel)
-            tempList = insideTheCaseViewModel.getWeaponListWithoutKnifes()
+            tempList = insideTheCaseViewModel.getListWithKnifes()
         }
         weaponList.addAll(tempList)
-        rowsAmount = kotlin.math.floor((weaponList.size+1) / 4.0).toInt()
-        lastRowLen = ((weaponList.size+1) % 4.0).toInt()
+        rowsAmount = kotlin.math.floor(weaponList.size / 4.0).toInt()
+        lastRowLen = (weaponList.size % 4.0).toInt()
     }
 
 
@@ -64,40 +61,13 @@ fun InsideTheCase(
                     .fillMaxWidth()
                     .height(200.dp)
             ) {
-                if (rowIndex == 0) {
-                    // Вставляем ваш особый элемент в начало первого ряда
-                    item {
-                        Column {
-                            Image(
-                                painter = painterResource(id = R.drawable.knife),
-                                contentDescription = "mainbg",
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .size(150.dp)
-                                    .clickable {
-                                        onClickGoKnifes(caseName)
-                                    },
-                                contentScale = ContentScale.Crop
-                            )
-                            Text(
-                                text = "Особый предмет"
-                            )
-                        }
-                    }
-                }
-
-                // Определяем количество элементов в ряду
-                val startIndex = if (rowIndex == 0) 0 else rowIndex * 4 - 1
                 val itemCountInRow = if (rowIndex == rowsAmount && lastRowLen > 0) {
                     lastRowLen
-                } else if (rowIndex == 0) {
-                    3
-                }
-                else {
+                } else {
                     4
                 }
                 items(itemCountInRow) { index ->
-                    val actualIndex = startIndex + rowIndex * 4 + index
+                    val actualIndex = rowIndex * 4 + index
                     if (actualIndex < weaponList.size) {
                         Column {
                             val resourceId = ResourceGenerator.getResourceId(
@@ -123,6 +93,3 @@ fun InsideTheCase(
         }
     }
 }
-
-
-

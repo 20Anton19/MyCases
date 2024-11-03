@@ -21,4 +21,7 @@ sealed class AppScreen {
 
     @Serializable
     class InsideTheCaseScreen(val caseName: String)  : AppScreen()
+
+    @Serializable
+    class InsideTheCaseKnifesScreen(val caseName: String)  : AppScreen()
 }
