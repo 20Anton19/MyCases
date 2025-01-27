@@ -5,6 +5,7 @@ plugins {
     id("kotlin-parcelize")
     id("kotlin-kapt")
     alias(libs.plugins.daggerHiltPlugin)
+    alias(libs.plugins.gms)
 }
 
 android {
@@ -54,6 +55,8 @@ android {
 }
 
 dependencies {
+    implementation (platform(libs.firebase.bom))
+
     implementation (libs.accompanist.systemuicontroller)
     implementation (libs.navigation.compose)
     implementation(libs.gson)
