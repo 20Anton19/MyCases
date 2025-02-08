@@ -50,6 +50,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -59,6 +62,14 @@ fun MainMenu(
     onClickGoPreCase: (String) -> Unit,
     onClickGoMyInventory: () -> Unit
 ) {
+    // Write a message to the database
+    val database = Firebase.firestore
+    database.collection("books")
+        .document().set(mapOf("name" to "уууууулетаю на Гаити"))
+
+
+
+
     val infiniteTransition = rememberInfiniteTransition()
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,

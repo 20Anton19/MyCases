@@ -26,10 +26,13 @@ volley = "1.2.1"
 kotlin = "1.9.0"
 serialization = "1.6.3"
 gmsVersion = "4.4.2"
-bomVersion = "33.5.1"
+bomVersion = "33.8.0"
+firebaseDatabase = "21.0.0"
 
 [libraries]
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "bomVersion" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx"}
+firebase-auth = { module = "com.google.firebase:firebase-auth"}
 
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -64,6 +67,7 @@ ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp"}
