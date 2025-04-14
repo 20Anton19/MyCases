@@ -65,7 +65,7 @@ fun MainMenu(
     // Write a message to the database
     val database = Firebase.firestore
     database.collection("books")
-        .document().set(mapOf("name" to "уууууулетаю на Гаити"))
+        .document().set(mapOf("name" to "пример"))
 
 
 

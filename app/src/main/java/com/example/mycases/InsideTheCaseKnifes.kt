@@ -32,7 +32,7 @@ fun InsideTheCaseKnifes(
     weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     insideTheCaseViewModel: InsideTheCaseViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
 ) {
-    //Log.d("Ebasooos", "Я тут")
+    //Log.d("E", "Я тут")
     val context = LocalContext.current
     var rowsAmount by remember { mutableStateOf(0) }
     var lastRowLen by remember { mutableStateOf(0) }

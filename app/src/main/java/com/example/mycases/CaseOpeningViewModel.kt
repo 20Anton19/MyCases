@@ -116,7 +116,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
     }
 
     init {
-        Log.d("EbasoEbaso", "Я создался")
+        Log.d("E1", "Я создался")
     }
 
 
@@ -136,7 +136,7 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
             }
             weaponList.add(weapon)  // Добавляем новое оружие в список
         }
-        Log.d("EbasoEbaso", "Я прогрузил список $weaponList")
+        Log.d("E1", "Я прогрузил список $weaponList")
     }
 
     private fun createPreloadImages(context: Context) {
@@ -160,6 +160,6 @@ class CaseOpeningViewModel @Inject constructor() : ViewModel() {
             resourceId
         }
         preloadedImages.addAll(prePreloadedImages)
-        Log.d("EbasoEbaso", "Я прогрузил изображения")
+        Log.d("E1", "Я прогрузил изображения")
     }
 }
