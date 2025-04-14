@@ -11,7 +11,7 @@ object User {
         syncWithFirebase()
     }
 //    var inventoryList: MutableList<Inventory>
-//val caseList: List<Pair<String, List<Int>>>,
+//val caseList: List<Pair<String, List<Int>>>,  ...
 
     private fun syncWithFirebase() {
 
