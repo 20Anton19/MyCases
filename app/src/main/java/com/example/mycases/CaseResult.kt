@@ -1,6 +1,7 @@
 package com.example.mycases
 
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,11 +35,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mycases.data.Inventory
 import com.example.mycases.data.WeaponData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
-fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, onClick: () -> Unit) {
-
+fun CaseResult(
+    centerItemIndex: WeaponData?,
+    weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    onClickGoMyInventory: () -> Unit,
+    onClickGoPreCase: (String) -> Unit
+) {
     val brush =  Brush.horizontalGradient(
         listOf(Color.Red, Color.Green, Color.Blue),
         startX = 0.0f,
@@ -121,6 +131,14 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
                 fontSize = 30.sp,               // Используйте нужный размер шрифта
                 color = Color.White
             )
+            Button(
+                modifier = Modifier.height(50.dp),
+                onClick = {
+                    onClickGoMyInventory()
+                }
+            ) {
+                Text(text = "Инвентарь")
+            }
         }
     }
     Box(
@@ -134,6 +152,21 @@ fun CaseResult(centerItemIndex: WeaponData?, weaponViewModel: WeaponViewModel, o
                 .height(30.dp)
                 .width(300.dp)
                 .background(brush)
+        )
+    }
+    Button(
+        modifier = Modifier
+            .width(150.dp)
+            .height(100.dp),
+        onClick = {
+            onClickGoPreCase(centerItemIndex!!.weaponCase)
+        }
+    ) {
+        Text(
+            text = "Назад",
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 30.sp,
+            color = Color.White
         )
     }
 }

@@ -3,6 +3,7 @@ package com.example.mycases
 import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,9 +37,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.Coil
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
+import com.example.mycases.data.Inventory
 import com.example.mycases.data.WeaponData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -46,104 +49,18 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-private val weaponList = mutableStateListOf<WeaponData>()
-private fun randomRarity(): String {
-    val choice = (0..9999).random()
-    val rarity: String
-    when (choice) {
-        in 0..25 -> {
-            rarity = "Contraband"
-        }
-        in 26..89 -> {
-            rarity = "Covert"
-        }
-        in 90..409 -> {
-            rarity = "Classified"
-        }
-        in 410..2007 -> {
-            rarity = "Restricted"
-        }
-        in 2008..9999 -> {
-            rarity = "Mil-Spec"
-        }
-        else -> {
-            Log.d("WeaponFragment", "Выпала дичь какая-то: choise = $choice")
-            rarity = "Ошибка"
-        }
-    }
-    return rarity
-}
-
-private fun randomQuality(): String {
-    val fValueInt = (0..10000).random()
-    val quality: String
-    when (fValueInt) {
-        in 0..700 -> {
-            quality = "Factory New"
-        }
-        in 701..1500 -> {
-            quality = "Minimal Wear"
-        }
-        in 1501..3700 -> {
-            quality = "Field-Tested"
-        }
-        in 3701..4400 -> {
-            quality = "Well-Worn"
-        }
-        in 4401 ..10000 -> {
-            quality = "Battle-Scarred"
-        }
-        else -> {
-            Log.d("WeaponFragment", "Выпала дичь какая-то")
-            quality = "Ошибка"
-        }
-    }
-    return quality
-}
-
-private suspend fun randomWeapon(weaponViewModel: WeaponViewModel): WeaponData {
-    return suspendCoroutine { continuation ->
-        val weapon = WeaponData(0, "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон", "Шаблон",10.0, true)
-        val rarity = randomRarity()
-        val quality = randomQuality()
-
-        //val rarity = "Covert"
-        //val quality = "Battle-Scarred"
-
-        weaponViewModel.getRandomWeaponVM(rarity, quality) { randWeapon ->
-            if (randWeapon == null) {
-                Log.d("WeaponFragment", "Такого оружия не нашлось + $rarity + $quality")
-                continuation.resume(weapon)
-            } else {
-                Log.d("WeaponFragment", "Оружие: $randWeapon")
-                continuation.resume(randWeapon)
-            }
-        }
-    }
-}
-
-private suspend fun preloadImages(context: Context, weaponList: List<WeaponData>): List<Int> {
-    val preloadedImages = weaponList.map { weapon ->
-        val resourceId = ResourceGenerator.getResourceId(context, weapon.name, weapon.skin)
-        if (resourceId != 0) {
-            // Предзагрузка с помощью Coil
-            ImageRequest.Builder(context)
-                .data(resourceId)
-                .allowHardware(false)
-                .build()
-                .let { request -> Coil.imageLoader(context).enqueue(request) }
-        }
-        resourceId
-    }
-    return preloadedImages
-}
-
 @Composable
-fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
+fun CaseOpening(
+    weaponViewModel: WeaponViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    caseOpeningViewModel: CaseOpeningViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+
+    onClick: (WeaponData) -> Unit
+) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
     val context = LocalContext.current
+    val weaponList = remember { mutableStateListOf<WeaponData>() }
     var lastIndex by remember { mutableStateOf(-1) }
     var isLoading by remember { mutableStateOf(true) }
     var preloadedImages by remember { mutableStateOf(listOf<Int>()) }
@@ -152,51 +69,41 @@ fun CaseOpening(weaponViewModel: WeaponViewModel, onClick: (Any?) -> Unit) {
         val itemSize = 1.dp
         val itemSizePx = with(density) { itemSize.toPx() }
         val itemsScrollCount = (7430..7570).random()
-        coroutineScope.launch {
-            listState.animateScrollBy(
-                value = itemSizePx * itemsScrollCount,
-                animationSpec = tween(durationMillis = 12000, easing = LinearOutSlowInEasing)
-            )
+        listState.animateScrollBy(
+            value = itemSizePx * itemsScrollCount,
+            animationSpec = tween(durationMillis = 12000, easing = LinearOutSlowInEasing)
+        )
 
-            // Calculate the center position
-            val center = listState.layoutInfo.viewportEndOffset / 2
+        // Calculate the center position
+        val center = listState.layoutInfo.viewportEndOffset / 2
 
-            // Find the item closest to the center
-            var centerItemIndex = listState.layoutInfo.visibleItemsInfo.minByOrNull {
-                Math.abs(it.offset + it.size / 2 - center)
-            }?.index
+        // Find the item closest to the center
+        var centerItemIndex = listState.layoutInfo.visibleItemsInfo.minByOrNull {
+            Math.abs(it.offset + it.size / 2 - center)
+        }?.index
 
-            delay(300) // задержка
-            onClick(weaponList[43])
+        caseOpeningViewModel.makeAllWork(weaponViewModel, context)
+        delay(50) // задержка
+        val weaponForInventory = Inventory(0, weaponList[43]!!.id)
+        withContext(Dispatchers.IO) {
+            weaponViewModel.insertWeaponToInventory(weaponForInventory)
         }
-
+        onClick(weaponList[43])
     }
 
-    LaunchedEffect(listState.firstVisibleItemIndex+2) {
-        if (listState.firstVisibleItemIndex != lastIndex) {
-            lastIndex = listState.firstVisibleItemIndex
-            val mediaPlayer = MediaPlayer.create(context, R.raw.case_sound)
-            mediaPlayer.start()
-            mediaPlayer.setOnCompletionListener { it.release() }
-        }
-    }
 
+        //ddfffdfddfdffd
     LaunchedEffect(Unit) {
-        repeat(47) {
-            // Получение оружия в асинхронной корутине
-            val weapon = withContext(Dispatchers.IO) {
-                randomWeapon(weaponViewModel)  // Асинхронный вызов
-            }
-            weaponList.add(weapon)  // Добавляем новое оружие в список
-        }
+        weaponList.clear()
+        weaponList.addAll(caseOpeningViewModel.getWeaponListOfRandoms())
         preloadedImages = withContext(Dispatchers.IO) {
-            preloadImages(context, weaponList)
+            //preloadImages(context, weaponList)
+            caseOpeningViewModel.preloadImages()
         }
         isLoading = false  // Завершаем загрузку
     }
 
     if (isLoading) {
-        // Показываем индикатор загрузки, пока данные загружаются
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Image(
                 painter = painterResource(id = R.drawable.mmm),

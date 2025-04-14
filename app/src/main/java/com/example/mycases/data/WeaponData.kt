@@ -7,8 +7,10 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
+import kotlinx.serialization.Serializable
 
 @Parcelize
+@Serializable
 @Entity(tableName = "weapon_table")
 data class WeaponData(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -18,9 +20,10 @@ data class WeaponData(
     val rarity: String,
     val quality: String,
     val qualityRu: String,
+    val positionInCase: Int,
     val price: Double,
     val statTrack: Boolean
-) : Parcelable
+): Parcelable
 
 @Entity(
     tableName = "inventory",

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "432162282952",
+    "firebase_url": "https://mycases-2dfa8-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "mycases-2dfa8",
+    "storage_bucket": "mycases-2dfa8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:432162282952:android:dd1a55df49198f022ef4fd",
+        "android_client_info": {
+          "package_name": "com.example.mycases"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "432162282952-rv65l56mt9p70k2hph4qo9335hqsrgsl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mycases",
+            "certificate_hash": "24570da77e7b34d6ae23c880fe84dfce6f7ed9dd"
+          }
+        },
+        {
+          "client_id": "432162282952-mu30g4ugq4u7b5rdnp3vsh3v3a3fp1d3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqbdvYJVd65RxLBJyrjepkxf_ZcjjZDO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "432162282952-mu30g4ugq4u7b5rdnp3vsh3v3a3fp1d3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -59,18 +59,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.mycases.data.WeaponData
 import com.example.mycases.data.WeaponDatabase
 import com.example.mycases.ui.theme.Roulette
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlin.reflect.typeOf
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         /////////////////////УБИРАЕМ ЧЕРНЫЕ ПОЛОСЫ ПО БОКАМ И СВЕРХУ////////////////////////
         // Настройка для полноэкранного отображения
@@ -91,7 +100,7 @@ class MainActivity : ComponentActivity() {
         }
         ///////////////////////////////////////////////////////////////////////////////
 
-
+        /*
         val database = WeaponDatabase.getDatabase(this)
         val weaponDao = database.weaponDao()
 
@@ -106,204 +115,94 @@ class MainActivity : ComponentActivity() {
         weaponDao.getAllWeapons().observe(this, Observer { WeaponList ->
             Log.d("WeaponViewModel", "Список оружий: $WeaponList")
         })
+        */
 
 
         setContent {
             val navController = rememberNavController()
             NavHost(
                 navController = navController,
-                startDestination = "screen_1"
-            ){
-                composable("screen_1"){
-                    MyApp(navController, weaponViewModel)
+                startDestination = AppScreen.MainMenuScreen
+            ) {
+                composable<AppScreen.MainMenuScreen> {
+                    MainMenu (
+                        onClickGoPreCase = {
+                            navController.navigate(AppScreen.PreCaseScreen(caseName = it))
+                        },
+                        onClickGoMyInventory = {
+                            navController.navigate(AppScreen.MyInventoryScreen)
+                        }
+                    )
                 }
-                // Экран 2: Передача объекта WeaponData
-                composable("screen_2") {
-                    CaseOpening(weaponViewModel) { resultWeapon ->
-                        val weaponJson = Uri.encode(Gson().toJson(resultWeapon))
-                        navController.navigate("screen_3/$weaponJson")
+
+                composable<AppScreen.PreCaseScreen> {
+                    val args = it.toRoute<AppScreen.PreCaseScreen>()
+                    PreCase(
+                        caseName = args.caseName,
+                        onClick = {
+                            navController.navigate(AppScreen.CaseOpeningScreen)
+                        },
+                        onClickShowInside = {
+                            navController.navigate(AppScreen.InsideTheCaseScreen(caseName = args.caseName))
+                        },
+                        onClickGoMainMenu = {
+                            navController.navigate(AppScreen.MainMenuScreen)
+                        }
+                    )
+                }
+
+                composable<AppScreen.InsideTheCaseScreen> {
+                    val args = it.toRoute<AppScreen.PreCaseScreen>()
+                    InsideTheCase(
+                        caseName = args.caseName,
+                        onClickGoKnifes = {
+                            navController.navigate(AppScreen.InsideTheCaseKnifesScreen(caseName = args.caseName))
+                        }
+                    )
+                }
+
+                composable<AppScreen.InsideTheCaseKnifesScreen> {
+                    val args = it.toRoute<AppScreen.InsideTheCaseScreen>()
+                    InsideTheCaseKnifes(
+                        caseName = args.caseName
+                    )
+                }
+
+                composable<AppScreen.CaseOpeningScreen> {
+                    CaseOpening() {
+                        Log.d("NavigationGaz", "Navigating to CaseResultScreen with weapon: $it")
+                        navController.navigate(AppScreen.CaseResultScreen(resultWeapon = it))
                     }
                 }
 
-                // Экран 3: Получение объекта WeaponData
-                composable(
-                    route = "screen_3/{resultWeapon}",
-                    arguments = listOf(navArgument("resultWeapon") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val weaponJson = backStackEntry.arguments?.getString("resultWeapon")
-                    val resultWeapon = Gson().fromJson(weaponJson, WeaponData::class.java)
-                    CaseResult(resultWeapon, weaponViewModel) {
-                        navController.navigate("screen_1")
-                    }
+                composable<AppScreen.CaseResultScreen> (
+                    typeMap = mapOf(
+                        typeOf<WeaponData>() to CustomNavType.WeaponDataType
+                    )
+                ) {
+                    val resultWeapon = it.arguments?.getParcelable<WeaponData>("resultWeapon")//вообще не так вроде надо, но работает
+                    Log.d("NavigationGaz", "Received weapon in CaseResultScreen: $it")
+                    CaseResult(
+                        centerItemIndex = resultWeapon,
+                        onClickGoMyInventory = {
+                            navController.navigate(AppScreen.MyInventoryScreen) // OnClick для перехода в инвентарь
+                        },
+                        onClickGoPreCase = {
+                            navController.navigate(AppScreen.PreCaseScreen(caseName = it))
+                        }
+                    )
                 }
-                composable("screen_4"){
-                    Roulette{
-                        navController.navigate("screen_1")
-                    }
+
+                composable<AppScreen.MyInventoryScreen> {
+                    MyInventory(
+                        onClickGoMainMenu = {
+                            navController.navigate(AppScreen.MainMenuScreen)
+                        }
+                    )
                 }
             }
 
         }
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-private fun MyApp(navController: NavController, weaponViewModel: WeaponViewModel) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val angle by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 0f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 4000
-                0f at 0 using LinearEasing
-                8f at 1000 using LinearEasing
-                0f at 2000 using LinearEasing
-                -8f at 3000 using LinearEasing
-                0f at 4000 using LinearEasing
-            },
-            repeatMode = RepeatMode.Restart,
-        ), label = "поворот кейса"
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Green)
-    ){
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = "gaz") },
-                    modifier = Modifier
-                        .height(35.dp),
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
-                        containerColor = Color.Blue.copy(alpha = 0.35f)
-                    ),
-
-                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-                )
-                Text(text = "гз")
-            },
-            content = {
-                Image(
-                    painter = painterResource(id = R.drawable.bg_main_01),
-                    contentDescription = "mainbg",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(30.dp, 65.dp, 30.dp, 65.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxHeight(),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate("screen_2")
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate("screen_4")
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
-                    }
-                    Column(
-                        modifier = Modifier.fillMaxHeight(),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate("screen_2")
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        Card(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(100.dp)
-                                .clickable {
-                                    navController.navigate("screen_2")
-                                }
-                                .graphicsLayer(rotationZ = angle)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kalash),
-                                contentDescription = "case1",
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
-                    }
-                }
-            },
-            bottomBar = {
-                BottomAppBar (
-                    modifier = Modifier
-                        .height(35.dp),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        text = "Bottom app bar",
-                    )
-                }
-            },
-            floatingActionButton = {
-                FloatingActionButton(onClick = {  }) {
-                    Icon(Icons.Default.Add, contentDescription = "Add")
-                }
-            }
-        )
     }
 }

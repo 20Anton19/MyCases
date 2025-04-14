@@ -1,8 +1,11 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.jetbrainsKotlin)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize")
     id("kotlin-kapt")
+    alias(libs.plugins.daggerHiltPlugin)
+    alias(libs.plugins.gms)
 }
 
 android {
@@ -42,7 +45,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = "1.5.0"
     }
     packaging {
         resources {
@@ -52,49 +55,63 @@ android {
 }
 
 dependencies {
-    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.17.0")
-    implementation ("androidx.navigation:navigation-compose:2.5.3")
-    implementation("com.google.code.gson:gson:2.8.9")
-    implementation("com.android.volley:volley:1.2.1")
-    implementation("org.jsoup:jsoup:1.15.3")
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.0.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation (platform(libs.firebase.bom))
+    implementation (libs.firebase.firestore)
+    implementation (libs.firebase.auth)
+
+    implementation (libs.accompanist.systemuicontroller)
+    implementation (libs.navigation.compose)
+    implementation(libs.gson)
+    implementation(libs.volley)
+    implementation(libs.jsoup)
+    implementation(libs.core.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.activity.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+    implementation(libs.firebase.database)
+    implementation(libs.play.services.auth)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
 
     //Coil
-    implementation("io.coil-kt:coil-compose:2.1.0")
+    implementation(libs.coil.compose)
 
     //Из MyRoomTry
-    implementation("androidx.room:room-runtime:2.5.1")
-    implementation("androidx.room:room-ktx:2.5.1")
-    implementation("androidx.test:core-ktx:1.6.1")
-    implementation("androidx.test.ext:junit-ktx:1.2.1")
-    kapt("androidx.room:room-compiler:2.5.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.test.core.ktx)
+    implementation(libs.junit.ktx)
+    kapt(libs.room.compiler)
+    implementation (libs.lifecycle.viewmodel.compose)
 
 
 
     // Коррутины
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation (libs.kotlinx.coroutines.core)
+    implementation (libs.kotlinx.coroutines.android)
 
     // ViewModel
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation (libs.lifecycle.viewmodel.ktx)
 
     // Lifecycle
     //implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
 
-    implementation ("androidx.compose.runtime:runtime-livedata:1.4.3")
+    implementation (libs.runtime.livedata)
+
+    //Navigation
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+    //Hilt
+    implementation (libs.hilt.android)
+    implementation (libs.hilt.navigation.compose)
+    kapt (libs.hilt.compiler)
 }

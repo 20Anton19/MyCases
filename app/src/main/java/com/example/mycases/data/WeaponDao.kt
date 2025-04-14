@@ -3,6 +3,7 @@ package com.example.mycases.data
 import androidx.core.location.LocationRequestCompat.Quality
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WeaponDao {
@@ -25,6 +26,9 @@ interface WeaponDao {
     @Query("SELECT * FROM inventory")
     fun getAllInventory(): LiveData<List<Inventory>>
 
+    @Query("SELECT * FROM inventory")
+    fun getAllInventoryFlow(): Flow<List<Inventory>>
+
     @Query("SELECT * FROM inventory ORDER BY dateAdded DESC")
     fun getAllInventorySortedByDate(): LiveData<List<Inventory>>
 
@@ -35,8 +39,12 @@ interface WeaponDao {
 
     //Получаем рандомно разные качества
 
-    @Query("SELECT * FROM weapon_table WHERE rarity = :rarityParam AND quality = :qualityParam ORDER BY RANDOM() LIMIT 1")
-    suspend fun getRandomWeapon(rarityParam: String, qualityParam: String): WeaponData
+    @Query("SELECT * FROM weapon_table WHERE weaponCase = :caseNameParam AND rarity = :rarityParam AND quality = :qualityParam ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomWeapon(caseNameParam: String, rarityParam: String, qualityParam: String): WeaponData
+
+    //
+    @Query("SELECT * FROM weapon_table WHERE weaponCase = :caseName AND quality = 'Factory New' ORDER BY positionInCase")
+    suspend fun getWeaponsInsideTheCase(caseName: String): List<WeaponData>
 
     /*
         @Query("DELETE FROM weapon_table")

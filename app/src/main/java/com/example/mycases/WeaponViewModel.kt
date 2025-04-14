@@ -1,18 +1,51 @@
 package com.example.mycases
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.core.location.LocationRequestCompat.Quality
 import androidx.lifecycle.*
 import com.example.mycases.data.Inventory
 import com.example.mycases.data.WeaponDao
 import com.example.mycases.data.WeaponData
+import com.example.mycases.data.WeaponDatabase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
+@HiltViewModel
+class WeaponViewModel @Inject constructor(
+    //private val weaponDao: WeaponDao
+    val weaponDatabase: WeaponDatabase
+) : ViewModel() {
 
-    //private val inventory: LiveData<List<Inventory>> = weaponDao.getAllInventory()
+    private val _weaponListWithDate = MutableStateFlow<List<Pair<WeaponData, Long>>>(emptyList())
+    val weaponListWithDate: StateFlow<List<Pair<WeaponData, Long>>> = _weaponListWithDate.asStateFlow()
 
-    //private val weaponList: LiveData<List<WeaponData>> = weaponDao.getAllWeapons()
+    private val inventory: LiveData<List<Inventory>> = weaponDatabase.weaponDao.getAllInventory()
+
+    private val weaponList: LiveData<List<WeaponData>> = weaponDatabase.weaponDao.getAllWeapons()
+
+
+
+    init {
+        Log.d("Ebasooo", "Я перезапустился")
+        viewModelScope.launch {
+            weaponDatabase.weaponDao.getAllInventoryFlow().collect { inventoryList ->
+                val pairs = inventoryList.map { inventoryItem ->
+                    val weapon = withContext(Dispatchers.IO) {
+                        weaponDatabase.weaponDao.getWeaponById(inventoryItem.weaponId)
+                    }
+                    Pair(weapon, inventoryItem.dateAdded)
+                }
+                _weaponListWithDate.value = pairs
+            }
+        }
+    }
 
     /*
     fun addRandomWeapon() {
@@ -23,15 +56,55 @@ class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
         }
     }
     */
-    fun getRandomWeaponVM(rarity: String, quality: String, onResult: (WeaponData?) -> Unit) {
+
+    fun getWhatInTheCase(caseName: String, onResult: (List<WeaponData>?) -> Unit) {
         viewModelScope.launch {
             try {
-                val randomWeapon = weaponDao.getRandomWeapon(rarity, quality)
+                val weaponList = weaponDatabase.weaponDao.getWeaponsInsideTheCase(caseName)
+                onResult(weaponList)
+            } catch (e: Exception) {
+                Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")
+                onResult(null)
+            }
+        }
+    }
+
+    fun getRandomWeaponVM(caseName: String, rarity: String, quality: String, onResult: (WeaponData?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val randomWeapon = weaponDatabase.weaponDao.getRandomWeapon(caseName, rarity, quality)
                 onResult(randomWeapon)
             } catch (e: Exception) {
                 Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")
                 onResult(null)
             }
+        }
+    }
+
+    fun getWeaponVM1(id: Int, onResult: (WeaponData?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val weapon = weaponDatabase.weaponDao.getWeaponById(id)
+                onResult(weapon)
+            } catch (e: Exception) {
+                Log.e("WeaponViewModel", "Ошибка получения оружия: ${e.message}")
+                onResult(null)
+            }
+        }
+    }
+
+
+    suspend fun getWeaponVM(id: Int): WeaponData {
+        return weaponDatabase.weaponDao.getWeaponById(id)
+    }
+
+    fun getInventoryVM(): LiveData<List<Inventory>> {
+        return inventory
+    }
+
+    fun insertWeaponToInventory(inventory: Inventory) {
+        viewModelScope.launch {
+            weaponDatabase.weaponDao.insertOrUpdateInventory(inventory)
         }
     }
 /*
@@ -150,7 +223,7 @@ class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
             }
         }
     }
-    */
+
     class Factory(private val weaponDao: WeaponDao) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(WeaponViewModel::class.java)) {
@@ -159,5 +232,5 @@ class WeaponViewModel(private val weaponDao: WeaponDao) : ViewModel() {
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
-    }
+    }*/
 }
